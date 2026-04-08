@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SubscriptionActions } from "@/components/dashboard/subscription-actions";
 
 export default async function SettingsPage({
   params,
@@ -27,14 +28,23 @@ export default async function SettingsPage({
 
   const { data: subscription } = await supabase
     .from("subscriptions")
-    .select("status, plan:plans(name, price_monthly)")
+    .select(
+      "status, mercadopago_subscription_id, current_period_end, plan:plans(name, slug, price_monthly, price_annual)"
+    )
     .eq("tenant_id", tenant.id)
     .single();
 
   const plan = subscription?.plan as unknown as {
     name: string;
+    slug: string;
     price_monthly: number;
+    price_annual: number;
   } | null;
+
+  const { data: allPlans } = await supabase
+    .from("plans")
+    .select("slug, name")
+    .order("price_monthly");
 
   const formatCLP = (amount: number) =>
     new Intl.NumberFormat("es-CL", {
@@ -42,6 +52,20 @@ export default async function SettingsPage({
       currency: "CLP",
       minimumFractionDigits: 0,
     }).format(amount);
+
+  const statusLabels: Record<string, string> = {
+    active: "Activa",
+    trialing: "Prueba gratuita",
+    past_due: "Pago pendiente",
+    cancelled: "Cancelada",
+  };
+
+  const hasMpSubscription = !!subscription?.mercadopago_subscription_id;
+  const trialEnd = subscription?.current_period_end
+    ? new Date(subscription.current_period_end)
+    : null;
+  const isTrialing =
+    subscription?.status === "active" && !hasMpSubscription && trialEnd;
 
   return (
     <div className="p-6">
@@ -72,27 +96,64 @@ export default async function SettingsPage({
           <CardHeader>
             <CardTitle>Suscripción</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-2 text-sm">
+          <CardContent className="grid gap-4 text-sm">
             {plan ? (
               <>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Plan</span>
-                  <span className="font-medium capitalize">{plan.name}</span>
+                <div className="grid gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Plan</span>
+                    <span className="font-medium">{plan.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Precio</span>
+                    <span>{formatCLP(plan.price_monthly)}/mes</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Estado</span>
+                    <Badge
+                      variant={
+                        subscription?.status === "active"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {statusLabels[subscription?.status ?? ""] ??
+                        subscription?.status}
+                    </Badge>
+                  </div>
+                  {isTrialing && trialEnd && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">
+                        Prueba hasta
+                      </span>
+                      <span>
+                        {trialEnd.toLocaleDateString("es-CL", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  {hasMpSubscription && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Pago</span>
+                      <span className="text-green-500 text-xs font-medium">
+                        MercadoPago activo
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Precio</span>
-                  <span>{formatCLP(plan.price_monthly)}/mes</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Estado</span>
-                  <Badge
-                    variant={
-                      subscription?.status === "active" ? "default" : "secondary"
-                    }
-                  >
-                    {subscription?.status === "active" ? "Activa" : subscription?.status}
-                  </Badge>
-                </div>
+
+                <SubscriptionActions
+                  tenantSlug={tenantSlug}
+                  currentPlanSlug={plan.slug}
+                  hasMpSubscription={hasMpSubscription}
+                  plans={(allPlans ?? []).map((p) => ({
+                    slug: p.slug,
+                    name: p.name,
+                  }))}
+                />
               </>
             ) : (
               <p className="text-muted-foreground">Sin suscripción activa</p>
