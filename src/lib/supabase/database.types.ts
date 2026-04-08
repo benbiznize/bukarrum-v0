@@ -507,7 +507,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_booking_if_available: {
+        Args: {
+          p_booker_id: string
+          p_duration_hours: number
+          p_end_time: string
+          p_location_id: string
+          p_resource_id: string
+          p_start_time: string
+          p_total_price: number
+        }
+        Returns: string
+      }
+      get_bookings_for_resource: {
+        Args: { p_end: string; p_resource_id: string; p_start: string }
+        Returns: {
+          end_time: string
+          start_time: string
+        }[]
+      }
       get_current_tenant_id: { Args: never; Returns: string }
+      upsert_booker: {
+        Args: { p_email: string; p_name: string; p_phone?: string }
+        Returns: string
+      }
     }
     Enums: {
       booking_status:

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { BookingFlow } from "@/components/booking/booking-flow";
 
 export default async function BookingPage({
   params,
@@ -18,14 +19,34 @@ export default async function BookingPage({
 
   if (!tenant) notFound();
 
-  // Check tenant has at least one location with at least one resource assigned
-  const { data: readyLocations } = await supabase
-    .from("resource_locations")
-    .select("location:locations!inner(id, tenant_id)")
-    .eq("location.tenant_id", tenant.id)
-    .limit(1);
+  // Fetch active locations that have at least one active resource assigned
+  const { data: locationRows } = await supabase
+    .from("locations")
+    .select("id, name, address, city, timezone")
+    .eq("tenant_id", tenant.id)
+    .eq("is_active", true)
+    .order("name");
 
-  if (!readyLocations || readyLocations.length === 0) {
+  const locations = locationRows ?? [];
+
+  // Filter to locations that have at least one resource
+  const { data: rlRows } = await supabase
+    .from("resource_locations")
+    .select("location_id")
+    .in(
+      "location_id",
+      locations.map((l) => l.id)
+    );
+
+  const locationsWithResources = new Set(
+    (rlRows ?? []).map((r) => r.location_id)
+  );
+
+  const readyLocations = locations.filter((l) =>
+    locationsWithResources.has(l.id)
+  );
+
+  if (readyLocations.length === 0) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold mb-2">{tenant.name}</h1>
@@ -37,11 +58,12 @@ export default async function BookingPage({
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6">
-      <h1 className="text-2xl font-bold">Reservar — {tenant.name}</h1>
-      <p className="text-muted-foreground">
-        Página de reservas próximamente
-      </p>
+    <main className="min-h-screen">
+      <BookingFlow
+        tenantId={tenant.id}
+        tenantName={tenant.name}
+        locations={readyLocations}
+      />
     </main>
   );
 }
