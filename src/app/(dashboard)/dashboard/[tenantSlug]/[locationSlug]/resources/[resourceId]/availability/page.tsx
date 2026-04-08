@@ -35,7 +35,7 @@ export default async function AvailabilityPage({
     .order("day_of_week")
     .order("start_time");
 
-  async function action(_prev: { error: string }, formData: FormData) {
+  async function action(_prev: { error: string; success?: boolean }, formData: FormData) {
     "use server";
     const result = await saveAvailability(
       tenantSlug,

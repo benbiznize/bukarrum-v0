@@ -19,6 +19,15 @@ export async function createResource(
   } = await supabase.auth.getUser();
   if (!user) return { error: "No autenticado" };
 
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", tenantSlug)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!tenant) return { error: "Tenant no encontrado" };
+
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const type = (formData.get("type") as ResourceType) || "room";
@@ -29,19 +38,30 @@ export async function createResource(
   if (!name) return { error: "El nombre es requerido" };
   if (isNaN(hourlyRate) || hourlyRate <= 0) return { error: "Tarifa inválida" };
 
-  const { error } = await supabase.from("resources").insert({
-    location_id: locationId,
-    name,
-    description,
-    type,
-    hourly_rate: hourlyRate,
-    min_duration_hours: minDuration,
-    max_duration_hours: maxDuration,
-  });
+  // Create the resource (tenant-scoped)
+  const { data: resource, error } = await supabase
+    .from("resources")
+    .insert({
+      tenant_id: tenant.id,
+      name,
+      description,
+      type,
+      hourly_rate: hourlyRate,
+      min_duration_hours: minDuration,
+      max_duration_hours: maxDuration,
+    })
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !resource) {
     return { error: "Algo salió mal. Intenta nuevamente." };
   }
+
+  // Assign resource to the current location
+  await supabase.from("resource_locations").insert({
+    resource_id: resource.id,
+    location_id: locationId,
+  });
 
   revalidatePath(`/dashboard/${tenantSlug}/${locationSlug}`);
   redirect(`/dashboard/${tenantSlug}/${locationSlug}`);

@@ -34,25 +34,20 @@ export default async function TenantDashboardPage({
         .eq("tenant_id", tenant.id),
       supabase
         .from("resources")
-        .select("id, location_id!inner(tenant_id)", {
-          count: "exact",
-          head: true,
-        })
-        .eq("location_id.tenant_id", tenant.id),
+        .select("id", { count: "exact", head: true })
+        .eq("tenant_id", tenant.id),
       supabase
         .from("bookings")
-        .select("id, resource_id!inner(location_id!inner(tenant_id))", {
+        .select("id, resource_id!inner(tenant_id)", {
           count: "exact",
           head: true,
         })
-        .eq("resource_id.location_id.tenant_id", tenant.id)
+        .eq("resource_id.tenant_id", tenant.id)
         .in("status", ["pending", "confirmed"]),
       supabase
         .from("bookings")
-        .select(
-          "total_price, resource_id!inner(location_id!inner(tenant_id))"
-        )
-        .eq("resource_id.location_id.tenant_id", tenant.id)
+        .select("total_price, resource_id!inner(tenant_id)")
+        .eq("resource_id.tenant_id", tenant.id)
         .eq("status", "confirmed"),
     ]);
 
@@ -74,7 +69,7 @@ export default async function TenantDashboardPage({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Locales"
+          title="Ubicaciones"
           value={String(locationsRes.count ?? 0)}
           icon={MapPin}
         />

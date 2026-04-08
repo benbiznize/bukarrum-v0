@@ -68,5 +68,5 @@ export async function saveAvailability(
   }
 
   revalidatePath(`/dashboard/${tenantSlug}/${locationSlug}`);
-  return { error: "" };
+  return { error: "", success: true };
 }

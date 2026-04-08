@@ -31,7 +31,16 @@
     "errorEmailTaken": "Este correo ya está registrado",
     "errorSlugTaken": "Este nombre ya está en uso, intenta otro",
     "errorGeneric": "Algo salió mal. Intenta nuevamente.",
-    "checkEmail": "Revisa tu correo para confirmar tu cuenta"
+    "checkEmail": "Revisa tu correo para confirmar tu cuenta",
+    "tabPassword": "Contraseña",
+    "tabMagicLink": "Enlace mágico",
+    "sendMagicLink": "Enviar código",
+    "otpPlaceholder": "123456",
+    "verifyOtp": "Verificar código",
+    "otpSent": "Revisa tu correo. Puedes ingresar el código de 6 dígitos o hacer clic en el enlace.",
+    "otpInvalid": "Código incorrecto o expirado. Intenta nuevamente.",
+    "resendCode": "Reenviar código",
+    "codeSent": "Código reenviado"
   },
   "booking": {
     "title": "Reservar",
@@ -47,10 +56,161 @@
   },
   "dashboard": {
     "title": "Panel de administración",
-    "locations": "Locales",
+    "locations": "Ubicaciones",
     "resources": "Recursos",
     "bookings": "Reservas",
     "settings": "Configuración",
     "subscription": "Suscripción"
+  },
+  "marketing": {
+    "nav": {
+      "home": "Inicio",
+      "pricing": "Precios",
+      "contact": "Contacto",
+      "login": "Iniciar sesión",
+      "signup": "Crear cuenta gratis"
+    },
+    "hero": {
+      "headline": "Gestiona y arrienda tus espacios creativos sin fricción",
+      "subtitle": "La plataforma todo-en-uno para estudios de música, salas DJ, cicloramas y salas de podcast. Reservas online, calendario inteligente y panel de control — todo en un solo lugar.",
+      "ctaPrimary": "Crear cuenta gratis",
+      "ctaSecondary": "Ver precios"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para gestionar tu estudio",
+      "subtitle": "Herramientas diseñadas para dueños de espacios creativos en Chile",
+      "multiLocation": {
+        "title": "Múltiples ubicaciones",
+        "description": "Administra todos tus locales desde un solo panel. Cada sede con sus propios recursos y horarios."
+      },
+      "onlineBooking": {
+        "title": "Reservas online 24/7",
+        "description": "Tus clientes reservan directo desde tu página personalizada. Sin llamadas, sin WhatsApp."
+      },
+      "calendar": {
+        "title": "Calendario y disponibilidad",
+        "description": "Configura horarios por recurso, bloquea fechas y evita doble-reservas automáticamente."
+      },
+      "dashboard": {
+        "title": "Panel de control",
+        "description": "Visualiza reservas, ingresos y ocupación en tiempo real. Toma decisiones con datos."
+      }
+    },
+    "howItWorks": {
+      "title": "Empieza en 3 simples pasos",
+      "step1": {
+        "title": "Crea tu cuenta",
+        "description": "Regístrate gratis y configura tu perfil de negocio en menos de 2 minutos."
+      },
+      "step2": {
+        "title": "Configura tus espacios",
+        "description": "Agrega tus ubicaciones, recursos (salas, equipos) y define horarios de disponibilidad."
+      },
+      "step3": {
+        "title": "Recibe reservas",
+        "description": "Comparte tu link de reservas y empieza a recibir clientes. Así de simple."
+      }
+    },
+    "socialProof": {
+      "title": "Estudios que confían en Bukarrum",
+      "testimonial1": {
+        "quote": "Dejamos de perder reservas por WhatsApp. Ahora todo queda registrado y organizado.",
+        "author": "Camila Rojas",
+        "role": "Dueña, Estudio Sónico"
+      },
+      "testimonial2": {
+        "quote": "El calendario evita las doble-reservas que antes eran un dolor de cabeza constante.",
+        "author": "Sebastián Muñoz",
+        "role": "Administrador, Sala Nebula"
+      },
+      "testimonial3": {
+        "quote": "En una semana ya teníamos todo configurado. La plataforma es súper intuitiva.",
+        "author": "Valentina Torres",
+        "role": "Fundadora, Ciclorama Sur"
+      }
+    },
+    "finalCta": {
+      "title": "¿Listo para profesionalizar tu estudio?",
+      "subtitle": "Únete a los estudios creativos que ya gestionan sus reservas con Bukarrum.",
+      "cta": "Comenzar gratis"
+    },
+    "pricing": {
+      "title": "Planes simples, sin sorpresas",
+      "subtitle": "Elige el plan que se adapta a tu estudio. Todos incluyen soporte por email.",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "annualSavings": "Ahorra 2 meses",
+      "perMonth": "/mes",
+      "perYear": "/año",
+      "cta": "Comenzar ahora",
+      "ctaEnterprise": "Contactar ventas",
+      "popular": "Más popular",
+      "starter": {
+        "name": "Starter",
+        "description": "Ideal para estudios con una sola ubicación",
+        "features": ["1 ubicación", "3 recursos por ubicación", "30 reservas al mes", "Página de reservas personalizada", "Soporte por email"]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para estudios en crecimiento con múltiples sedes",
+        "features": ["3 ubicaciones", "10 recursos por ubicación", "200 reservas al mes", "Servicios add-on", "Página de reservas personalizada", "Soporte prioritario"]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Para operaciones a gran escala sin límites",
+        "features": ["Ubicaciones ilimitadas", "Recursos ilimitados", "Reservas ilimitadas", "Servicios add-on", "Analytics y reportes", "Soporte dedicado"]
+      },
+      "faq": {
+        "title": "Preguntas frecuentes",
+        "items": [
+          {
+            "question": "¿Puedo cambiar de plan después?",
+            "answer": "Sí, puedes subir o bajar de plan en cualquier momento desde tu panel de configuración."
+          },
+          {
+            "question": "¿Hay período de prueba?",
+            "answer": "Todos los planes incluyen 14 días de prueba gratis. No necesitas tarjeta de crédito."
+          },
+          {
+            "question": "¿Cómo funciona el pago?",
+            "answer": "Aceptamos pagos con tarjeta de crédito y débito a través de MercadoPago. La facturación es mensual o anual según tu preferencia."
+          },
+          {
+            "question": "¿Qué pasa si supero el límite de reservas?",
+            "answer": "Te notificaremos cuando estés cerca del límite. Puedes subir de plan para seguir recibiendo reservas sin interrupción."
+          },
+          {
+            "question": "¿Puedo cancelar en cualquier momento?",
+            "answer": "Sí, sin permanencia mínima. Si cancelas, mantienes acceso hasta el fin del período pagado."
+          }
+        ]
+      }
+    },
+    "contact": {
+      "title": "Conversemos",
+      "subtitle": "¿Tienes preguntas o necesitas una demo personalizada? Escríbenos y te respondemos en menos de 24 horas.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@correo.com",
+      "businessLabel": "Nombre del negocio",
+      "businessPlaceholder": "Ej: Estudio Sónico",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Cuéntanos sobre tu estudio y qué necesitas...",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "successTitle": "¡Mensaje enviado!",
+      "successMessage": "Gracias por contactarnos. Te responderemos pronto.",
+      "errorMessage": "Algo salió mal. Intenta nuevamente."
+    },
+    "footer": {
+      "description": "La plataforma de gestión de reservas para espacios creativos en Chile.",
+      "product": "Producto",
+      "company": "Empresa",
+      "legal": "Legal",
+      "terms": "Términos de servicio",
+      "privacy": "Política de privacidad",
+      "copyright": "Todos los derechos reservados."
+    }
   }
 }

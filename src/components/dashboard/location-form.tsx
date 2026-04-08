@@ -33,7 +33,7 @@ export function LocationForm({
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle>{isEditing ? "Editar local" : "Nuevo local"}</CardTitle>
+        <CardTitle>{isEditing ? "Editar ubicación" : "Nueva ubicación"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
@@ -97,7 +97,7 @@ export function LocationForm({
                 name="is_active"
                 defaultChecked={location?.is_active ?? true}
               />
-              <Label htmlFor="is_active">Local activo</Label>
+              <Label htmlFor="is_active">Ubicación activa</Label>
             </div>
           )}
 
@@ -110,7 +110,7 @@ export function LocationForm({
               ? "Guardando..."
               : isEditing
                 ? "Guardar cambios"
-                : "Crear local"}
+                : "Crear ubicación"}
           </Button>
         </form>
       </CardContent>

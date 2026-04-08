@@ -27,7 +27,7 @@ export default async function EditLocationPage({
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Editar local</h1>
+      <h1 className="text-2xl font-bold mb-6">Editar ubicación</h1>
       <LocationForm location={location} action={action} />
     </div>
   );

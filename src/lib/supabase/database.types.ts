@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -188,6 +183,7 @@ export type Database = {
           duration_hours: number
           end_time: string
           id: string
+          location_id: string | null
           notes: string | null
           resource_id: string
           start_time: string
@@ -201,6 +197,7 @@ export type Database = {
           duration_hours: number
           end_time: string
           id?: string
+          location_id?: string | null
           notes?: string | null
           resource_id: string
           start_time: string
@@ -214,6 +211,7 @@ export type Database = {
           duration_hours?: number
           end_time?: string
           id?: string
+          location_id?: string | null
           notes?: string | null
           resource_id?: string
           start_time?: string
@@ -227,6 +225,13 @@ export type Database = {
             columns: ["booker_id"]
             isOneToOne: false
             referencedRelation: "bookers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
           {
@@ -327,6 +332,42 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_locations: {
+        Row: {
+          created_at: string
+          id: string
+          location_id: string
+          resource_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_id: string
+          resource_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_id?: string
+          resource_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_locations_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_locations_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resources: {
         Row: {
           created_at: string
@@ -335,10 +376,10 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
-          location_id: string
           max_duration_hours: number
           min_duration_hours: number
           name: string
+          tenant_id: string
           type: Database["public"]["Enums"]["resource_type"]
           updated_at: string
         }
@@ -349,10 +390,10 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
-          location_id: string
           max_duration_hours?: number
           min_duration_hours?: number
           name: string
+          tenant_id: string
           type?: Database["public"]["Enums"]["resource_type"]
           updated_at?: string
         }
@@ -363,19 +404,19 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
-          location_id?: string
           max_duration_hours?: number
           min_duration_hours?: number
           name?: string
+          tenant_id?: string
           type?: Database["public"]["Enums"]["resource_type"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "resources_location_id_fkey"
-            columns: ["location_id"]
+            foreignKeyName: "resources_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
-            referencedRelation: "locations"
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -636,3 +677,4 @@ export const Constants = {
     },
   },
 } as const
+

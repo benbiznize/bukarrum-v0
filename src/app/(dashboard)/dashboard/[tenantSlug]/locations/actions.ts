@@ -52,7 +52,7 @@ export async function createLocation(tenantSlug: string, formData: FormData) {
 
   if (error) {
     if (error.code === "23505") {
-      return { error: "Ya existe un local con este nombre" };
+      return { error: "Ya existe una ubicación con este nombre" };
     }
     return { error: "Algo salió mal. Intenta nuevamente." };
   }

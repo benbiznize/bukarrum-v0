@@ -83,5 +83,5 @@ export async function createTenant(formData: FormData) {
     return { error: "Algo salió mal. Intenta nuevamente." };
   }
 
-  redirect(`/dashboard/${tenant.slug}`);
+  redirect("/onboarding/location");
 }

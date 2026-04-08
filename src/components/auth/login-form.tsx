@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function LoginForm() {
   const router = useRouter();
@@ -22,6 +23,14 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Magic link / OTP state
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpResent, setOtpResent] = useState(false);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +53,79 @@ export function LoginForm() {
     router.refresh();
   }
 
+  async function handleSendOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setOtpError(null);
+    setOtpLoading(true);
+    setOtpResent(false);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email: otpEmail,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        shouldCreateUser: false,
+      },
+    });
+
+    setOtpLoading(false);
+
+    if (error && error.status !== 422) {
+      setOtpError("Algo salió mal. Intenta nuevamente.");
+      return;
+    }
+
+    // Always show verification form — don't reveal whether the email exists
+    setOtpSent(true);
+  }
+
+  async function handleVerifyOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setOtpError(null);
+    setOtpLoading(true);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email: otpEmail,
+      token: otpCode,
+      type: "email",
+    });
+
+    setOtpLoading(false);
+
+    if (error) {
+      setOtpError("Código incorrecto o expirado. Intenta nuevamente.");
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  async function handleResendOtp() {
+    setOtpError(null);
+    setOtpLoading(true);
+    setOtpResent(false);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email: otpEmail,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        shouldCreateUser: false,
+      },
+    });
+
+    setOtpLoading(false);
+
+    if (error) {
+      setOtpError("Algo salió mal. Intenta nuevamente.");
+      return;
+    }
+
+    setOtpResent(true);
+  }
+
   async function handleGoogleLogin() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -64,45 +146,120 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <form onSubmit={handleEmailLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="tu@correo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          <Tabs defaultValue={0}>
+            <TabsList className="w-full">
+              <TabsTrigger value={0}>Contraseña</TabsTrigger>
+              <TabsTrigger value={1}>Enlace mágico</TabsTrigger>
+            </TabsList>
 
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            <TabsContent value={0}>
+              <form onSubmit={handleEmailLogin} className="grid gap-4 pt-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Correo electrónico</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Cargando..." : "Iniciar sesión"}
-            </Button>
-          </form>
+                {error && (
+                  <p className="text-sm text-destructive">{error}</p>
+                )}
+
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Cargando..." : "Iniciar sesión"}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value={1}>
+              {!otpSent ? (
+                <form onSubmit={handleSendOtp} className="grid gap-4 pt-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="otp-email">Correo electrónico</Label>
+                    <Input
+                      id="otp-email"
+                      type="email"
+                      placeholder="tu@correo.com"
+                      value={otpEmail}
+                      onChange={(e) => setOtpEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {otpError && (
+                    <p className="text-sm text-destructive">{otpError}</p>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={otpLoading}>
+                    {otpLoading ? "Enviando..." : "Enviar código"}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp} className="grid gap-4 pt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Revisa tu correo. Puedes ingresar el código de 6 dígitos o hacer clic en el enlace.
+                  </p>
+                  <div className="grid gap-2">
+                    <Label htmlFor="otp-code">Código de verificación</Label>
+                    <Input
+                      id="otp-code"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="123456"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      required
+                    />
+                  </div>
+
+                  {otpError && (
+                    <p className="text-sm text-destructive">{otpError}</p>
+                  )}
+
+                  {otpResent && (
+                    <p className="text-sm text-green-600">Código reenviado</p>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={otpLoading}>
+                    {otpLoading ? "Verificando..." : "Verificar código"}
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={otpLoading}
+                    className="text-sm text-muted-foreground underline-offset-4 hover:underline disabled:opacity-50"
+                  >
+                    Reenviar código
+                  </button>
+                </form>
+              )}
+            </TabsContent>
+          </Tabs>
 
           <div className="flex items-center gap-4">
             <Separator className="flex-1" />

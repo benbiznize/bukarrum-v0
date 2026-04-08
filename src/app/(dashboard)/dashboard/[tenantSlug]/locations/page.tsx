@@ -44,10 +44,10 @@ export default async function LocationsPage({
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Locales</h1>
+        <h1 className="text-2xl font-bold">Ubicaciones</h1>
         <Link href={`/dashboard/${tenantSlug}/locations/new`} className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />
-            Nuevo local
+            Nueva ubicación
         </Link>
       </div>
 
@@ -93,10 +93,10 @@ export default async function LocationsPage({
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed py-12">
-          <p className="text-muted-foreground mb-4">No tienes locales aún</p>
+          <p className="text-muted-foreground mb-4">No tienes ubicaciones aún</p>
           <Link href={`/dashboard/${tenantSlug}/locations/new`} className={buttonVariants()}>
               <Plus className="mr-2 h-4 w-4" />
-              Crear tu primer local
+              Crear tu primera ubicación
           </Link>
         </div>
       )}

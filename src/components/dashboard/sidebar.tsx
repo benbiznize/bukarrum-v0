@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   MapPin,
+  Box,
   CalendarDays,
   Settings,
   LayoutDashboard,
@@ -62,13 +63,19 @@ export function DashboardSidebar({
             label="Reservas"
             active={pathname.startsWith(`${base}/bookings`)}
           />
+          <SidebarLink
+            href={`${base}/locations`}
+            icon={Box}
+            label="Recursos"
+            active={pathname.startsWith(`${base}/locations`)}
+          />
         </div>
 
         {/* Locations */}
         <div className="mt-6">
           <div className="flex items-center justify-between px-3 mb-2">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Locales
+              Ubicaciones
             </span>
             <Link
               href={`${base}/locations/new`}
@@ -90,7 +97,7 @@ export function DashboardSidebar({
             ))}
             {locations.length === 0 && (
               <p className="px-3 text-xs text-muted-foreground">
-                Sin locales aún
+                Sin ubicaciones aún
               </p>
             )}
           </div>

@@ -44,11 +44,15 @@ export default async function LocationDashboardPage({
 
   if (!location) notFound();
 
-  const { data: resources } = await supabase
-    .from("resources")
-    .select("*")
-    .eq("location_id", location.id)
-    .order("name");
+  // Fetch resources assigned to this location via junction table
+  const { data: resourceLinks } = await supabase
+    .from("resource_locations")
+    .select("resource:resources(*)")
+    .eq("location_id", location.id);
+
+  const resources = (resourceLinks ?? [])
+    .map((rl) => rl.resource as unknown as NonNullable<typeof rl.resource>)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const formatCLP = (amount: number) =>
     new Intl.NumberFormat("es-CL", {
@@ -131,7 +135,7 @@ export default async function LocationDashboardPage({
       ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed py-12">
           <p className="text-muted-foreground mb-4">
-            Este local no tiene recursos aún
+            Esta ubicación no tiene recursos aún
           </p>
           <Link href={`${base}/resources/new`} className={buttonVariants()}>
               <Plus className="mr-2 h-4 w-4" />

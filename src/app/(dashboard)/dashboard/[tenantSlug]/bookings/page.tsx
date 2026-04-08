@@ -65,11 +65,11 @@ export default async function BookingsPage({
       resource:resources!inner(
         id,
         name,
-        location:locations!inner(
-          id,
-          name,
-          tenant_id
-        )
+        tenant_id
+      ),
+      location:locations(
+        id,
+        name
       ),
       booker:bookers!inner(
         id,
@@ -79,7 +79,7 @@ export default async function BookingsPage({
       )
     `
     )
-    .eq("resource.location.tenant_id", tenant.id)
+    .eq("resource.tenant_id", tenant.id)
     .order("start_time", { ascending: false });
 
   const formatCLP = (amount: number) =>
@@ -113,7 +113,7 @@ export default async function BookingsPage({
               <TableRow>
                 <TableHead>Fecha/Hora</TableHead>
                 <TableHead>Recurso</TableHead>
-                <TableHead>Local</TableHead>
+                <TableHead>Ubicación</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Duración</TableHead>
                 <TableHead>Total</TableHead>
@@ -126,8 +126,12 @@ export default async function BookingsPage({
                 const resource = booking.resource as unknown as {
                   id: string;
                   name: string;
-                  location: { id: string; name: string; tenant_id: string };
+                  tenant_id: string;
                 };
+                const location = booking.location as unknown as {
+                  id: string;
+                  name: string;
+                } | null;
                 const booker = booking.booker as unknown as {
                   id: string;
                   name: string;
@@ -143,7 +147,7 @@ export default async function BookingsPage({
                     <TableCell className="font-medium">
                       {resource.name}
                     </TableCell>
-                    <TableCell>{resource.location.name}</TableCell>
+                    <TableCell>{location?.name ?? "—"}</TableCell>
                     <TableCell>
                       <div>{booker.name}</div>
                       <div className="text-xs text-muted-foreground">

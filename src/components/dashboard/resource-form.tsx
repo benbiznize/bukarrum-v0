@@ -75,8 +75,8 @@ export function ResourceForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="room">Sala</SelectItem>
-                <SelectItem value="equipment">Equipamiento</SelectItem>
+                <SelectItem value="room" label="Sala">Sala</SelectItem>
+                <SelectItem value="equipment" label="Equipamiento">Equipamiento</SelectItem>
               </SelectContent>
             </Select>
           </div>

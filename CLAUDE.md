@@ -81,15 +81,16 @@ src/
 
 ## Domain Model
 
-**Entity hierarchy**: Tenant → Locations → Resources → Bookings
+**Entity hierarchy**: Tenant → Resources (tenant-scoped) ↔ Locations (many-to-many via `resource_locations`)
 
 | Table | Description |
 |-------|-------------|
 | `tenants` | Studio businesses. One business = one tenant = one membership. |
 | `locations` | Physical stores/branches (name, address, timezone, tenant_id). Count gated by subscription tier. |
-| `resources` | Bookable rooms/equipment within a location (name, type, hourly_rate, location_id). |
+| `resources` | Bookable rooms/equipment (name, type, hourly_rate, tenant_id). Tenant-scoped, assignable to multiple locations. |
+| `resource_locations` | Junction table: many-to-many between resources and locations. |
 | `availability` | Time slots when a resource is available for booking. |
-| `bookings` | Reservations (resource_id, booker_id, start_time, end_time, status). |
+| `bookings` | Reservations (resource_id, location_id, booker_id, start_time, end_time, status). |
 | `bookers` | End customers who make bookings. |
 | `plans` | Subscription plan definitions (name, slug, price_monthly, price_annual, features JSONB). |
 | `subscriptions` | Tenant subscription state (plan_id, status, MercadoPago ref). Links tenant to active plan. |

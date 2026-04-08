@@ -117,12 +117,12 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {features.locations === -1
-                          ? "Locales ilimitados"
-                          : `${features.locations} ${features.locations === 1 ? "local" : "locales"}`}
+                          ? "Ubicaciones ilimitadas"
+                          : `${features.locations} ${features.locations === 1 ? "ubicación" : "ubicaciones"}`}
                         {" · "}
                         {features.resources_per_location === -1
                           ? "Recursos ilimitados"
-                          : `${features.resources_per_location} recursos/local`}
+                          : `${features.resources_per_location} recursos/ubicación`}
                         {features.add_ons && " · Add-ons"}
                         {features.analytics && " · Analytics"}
                       </p>
@@ -138,8 +138,12 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
           )}
 
           <Button type="submit" className="w-full" disabled={isPending || !name.trim()}>
-            {isPending ? "Creando..." : "Crear negocio"}
+            {isPending ? "Creando..." : "Continuar"}
           </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            Paso 1 de 3
+          </p>
         </form>
       </CardContent>
     </Card>

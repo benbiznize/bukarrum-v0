@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,22 +43,30 @@ const DAYS: DayOfWeek[] = [
   "sunday",
 ];
 
+function buildEnabledMap(availability: AvailabilitySlot[]): Record<DayOfWeek, boolean> {
+  const map = {} as Record<DayOfWeek, boolean>;
+  for (const day of DAYS) map[day] = false;
+  for (const slot of availability) map[slot.day_of_week] = true;
+  return map;
+}
+
 export function AvailabilityEditor({
   availability,
   action,
 }: {
   availability: AvailabilitySlot[];
   action: (
-    prev: { error: string },
+    prev: { error: string; success?: boolean },
     formData: FormData
-  ) => Promise<{ error: string }>;
+  ) => Promise<{ error: string; success?: boolean }>;
 }) {
   const slotsByDay = new Map<DayOfWeek, AvailabilitySlot>();
   for (const slot of availability) {
     slotsByDay.set(slot.day_of_week, slot);
   }
 
-  const [state, formAction, isPending] = useActionState(action, { error: "" });
+  const [enabled, setEnabled] = useState(() => buildEnabledMap(availability));
+  const [state, formAction, isPending] = useActionState(action, { error: "", success: false });
 
   return (
     <Card className="max-w-lg">
@@ -75,7 +83,10 @@ export function AvailabilityEditor({
                   <Switch
                     id={`enabled_${day}`}
                     name={`enabled_${day}`}
-                    defaultChecked={!!slot}
+                    checked={enabled[day]}
+                    onCheckedChange={(val) =>
+                      setEnabled((prev) => ({ ...prev, [day]: val }))
+                    }
                   />
                   <Label htmlFor={`enabled_${day}`} className="text-sm">
                     {DAY_LABELS[day]}
@@ -100,6 +111,10 @@ export function AvailabilityEditor({
 
           {state.error && (
             <p className="text-sm text-destructive">{state.error}</p>
+          )}
+
+          {state.success && !state.error && (
+            <p className="text-sm text-green-600">Horario guardado correctamente</p>
           )}
 
           <Button type="submit" disabled={isPending}>

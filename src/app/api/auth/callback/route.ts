@@ -40,16 +40,6 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
-  // Detect password recovery flow and redirect to reset page
-  if (data.session?.user?.recovery_sent_at) {
-    const recoverySentAt = new Date(data.session.user.recovery_sent_at).getTime();
-    const now = Date.now();
-    // If recovery was sent within the last 10 minutes, this is likely a recovery flow
-    if (now - recoverySentAt < 10 * 60 * 1000) {
-      return NextResponse.redirect(`${origin}/reset-password`);
-    }
-  }
-
   const redirectTo = await resolvePostAuthRedirect(supabase);
   return NextResponse.redirect(`${origin}${redirectTo}`);
 }

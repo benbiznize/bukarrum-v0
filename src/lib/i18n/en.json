@@ -52,5 +52,156 @@
     "bookings": "Bookings",
     "settings": "Settings",
     "subscription": "Subscription"
+  },
+  "marketing": {
+    "nav": {
+      "home": "Home",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "login": "Sign in",
+      "signup": "Get started free"
+    },
+    "hero": {
+      "headline": "Manage and rent your creative spaces without friction",
+      "subtitle": "The all-in-one platform for music studios, DJ rooms, cycloramas, and podcast rooms. Online bookings, smart calendar, and dashboard — all in one place.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "See pricing"
+    },
+    "features": {
+      "title": "Everything you need to manage your studio",
+      "subtitle": "Tools designed for creative space owners in Chile",
+      "multiLocation": {
+        "title": "Multiple locations",
+        "description": "Manage all your venues from a single dashboard. Each location with its own resources and schedules."
+      },
+      "onlineBooking": {
+        "title": "Online bookings 24/7",
+        "description": "Your clients book directly from your custom page. No calls, no WhatsApp."
+      },
+      "calendar": {
+        "title": "Calendar & availability",
+        "description": "Set schedules per resource, block dates, and prevent double-bookings automatically."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "View bookings, revenue, and occupancy in real time. Make data-driven decisions."
+      }
+    },
+    "howItWorks": {
+      "title": "Get started in 3 simple steps",
+      "step1": {
+        "title": "Create your account",
+        "description": "Sign up for free and set up your business profile in under 2 minutes."
+      },
+      "step2": {
+        "title": "Configure your spaces",
+        "description": "Add your locations, resources (rooms, equipment) and set availability schedules."
+      },
+      "step3": {
+        "title": "Receive bookings",
+        "description": "Share your booking link and start receiving clients. It's that simple."
+      }
+    },
+    "socialProof": {
+      "title": "Studios that trust Bukarrum",
+      "testimonial1": {
+        "quote": "We stopped losing bookings through WhatsApp. Now everything is recorded and organized.",
+        "author": "Camila Rojas",
+        "role": "Owner, Estudio Sónico"
+      },
+      "testimonial2": {
+        "quote": "The calendar prevents double-bookings that used to be a constant headache.",
+        "author": "Sebastián Muñoz",
+        "role": "Manager, Sala Nebula"
+      },
+      "testimonial3": {
+        "quote": "In one week we had everything set up. The platform is super intuitive.",
+        "author": "Valentina Torres",
+        "role": "Founder, Ciclorama Sur"
+      }
+    },
+    "finalCta": {
+      "title": "Ready to professionalize your studio?",
+      "subtitle": "Join the creative studios already managing their bookings with Bukarrum.",
+      "cta": "Get started free"
+    },
+    "pricing": {
+      "title": "Simple plans, no surprises",
+      "subtitle": "Choose the plan that fits your studio. All plans include email support.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualSavings": "Save 2 months",
+      "perMonth": "/mo",
+      "perYear": "/yr",
+      "cta": "Get started",
+      "ctaEnterprise": "Contact sales",
+      "popular": "Most popular",
+      "starter": {
+        "name": "Starter",
+        "description": "Ideal for studios with a single location",
+        "features": ["1 location", "3 resources per location", "30 bookings per month", "Custom booking page", "Email support"]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For growing studios with multiple locations",
+        "features": ["3 locations", "10 resources per location", "200 bookings per month", "Add-on services", "Custom booking page", "Priority support"]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "For large-scale operations with no limits",
+        "features": ["Unlimited locations", "Unlimited resources", "Unlimited bookings", "Add-on services", "Analytics & reports", "Dedicated support"]
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "items": [
+          {
+            "question": "Can I change plans later?",
+            "answer": "Yes, you can upgrade or downgrade your plan at any time from your settings."
+          },
+          {
+            "question": "Is there a free trial?",
+            "answer": "All plans include a 14-day free trial. No credit card required."
+          },
+          {
+            "question": "How does payment work?",
+            "answer": "We accept credit and debit card payments through MercadoPago. Billing is monthly or annual based on your preference."
+          },
+          {
+            "question": "What happens if I exceed the booking limit?",
+            "answer": "We'll notify you when you're close to the limit. You can upgrade to keep receiving bookings without interruption."
+          },
+          {
+            "question": "Can I cancel at any time?",
+            "answer": "Yes, no minimum commitment. If you cancel, you keep access until the end of your paid period."
+          }
+        ]
+      }
+    },
+    "contact": {
+      "title": "Let's talk",
+      "subtitle": "Have questions or need a personalized demo? Write to us and we'll respond within 24 hours.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "businessLabel": "Business name",
+      "businessPlaceholder": "E.g.: Sonic Studio",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Tell us about your studio and what you need...",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "successTitle": "Message sent!",
+      "successMessage": "Thanks for contacting us. We'll get back to you soon.",
+      "errorMessage": "Something went wrong. Please try again."
+    },
+    "footer": {
+      "description": "The booking management platform for creative spaces in Chile.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "terms": "Terms of service",
+      "privacy": "Privacy policy",
+      "copyright": "All rights reserved."
+    }
   }
 }

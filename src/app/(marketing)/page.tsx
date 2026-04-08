@@ -1,10 +1,27 @@
-export default function HomePage() {
+import type { Metadata } from "next";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { HeroSection } from "@/components/marketing/hero-section";
+import { FeaturesSection } from "@/components/marketing/features-section";
+import { HowItWorksSection } from "@/components/marketing/how-it-works-section";
+import { SocialProofSection } from "@/components/marketing/social-proof-section";
+import { FinalCtaSection } from "@/components/marketing/final-cta-section";
+
+export const metadata: Metadata = {
+  title: "Bukarrum — Gestiona y arrienda tus espacios creativos",
+  description:
+    "La plataforma todo-en-uno para estudios de música, salas DJ, cicloramas y salas de podcast. Reservas online, calendario inteligente y panel de control.",
+};
+
+export default async function HomePage() {
+  const dict = await getDictionary("es");
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold">Bukarrum</h1>
-      <p className="mt-4 text-lg text-muted-foreground">
-        Reserva espacios creativos por hora
-      </p>
+    <main>
+      <HeroSection dict={dict.marketing} />
+      <FeaturesSection dict={dict.marketing} />
+      <HowItWorksSection dict={dict.marketing} />
+      <SocialProofSection dict={dict.marketing} />
+      <FinalCtaSection dict={dict.marketing} />
     </main>
   );
 }

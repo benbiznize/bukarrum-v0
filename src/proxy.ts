@@ -1,5 +1,33 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+
+/** Walk the onboarding funnel to find the right destination. */
+async function resolveRedirect(supabase: SupabaseClient, userId: string): Promise<string> {
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id, slug")
+    .eq("user_id", userId)
+    .single();
+
+  if (!tenant) return "/onboarding";
+
+  const { count: locCount } = await supabase
+    .from("locations")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenant.id);
+
+  if (!locCount || locCount === 0) return "/onboarding/location";
+
+  const { count: resCount } = await supabase
+    .from("resources")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenant.id);
+
+  if (!resCount || resCount === 0) return "/onboarding/resource";
+
+  return `/dashboard/${tenant.slug}`;
+}
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -11,6 +39,12 @@ export async function proxy(request: NextRequest) {
 
   // Skip auth check if Supabase is not configured
   if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
+
+  // Skip proxy for auth callback — it handles its own session exchange
+  // and proxy interference can break PKCE flows (password reset, magic links)
+  if (request.nextUrl.pathname === "/api/auth/callback") {
     return response;
   }
 
@@ -46,17 +80,8 @@ export async function proxy(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (user && (pathname === "/login" || pathname === "/signup")) {
-    const { data: tenant } = await supabase
-      .from("tenants")
-      .select("slug")
-      .eq("user_id", user.id)
-      .single();
-
-    const redirectUrl = new URL(
-      tenant ? `/dashboard/${tenant.slug}` : "/onboarding",
-      request.url
-    );
-    return NextResponse.redirect(redirectUrl);
+    const dest = await resolveRedirect(supabase, user.id);
+    return NextResponse.redirect(new URL(dest, request.url));
   }
 
   // Protect dashboard routes — redirect to login if unauthenticated
@@ -65,23 +90,19 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protect onboarding — must be authenticated
-  if (!user && pathname === "/onboarding") {
+  if (!user && pathname.startsWith("/onboarding")) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Protect reset-password — must have a recovery session
+  if (!user && pathname === "/reset-password") {
+    return NextResponse.redirect(new URL("/forgot-password", request.url));
   }
 
   // Authenticated user hitting /dashboard without a slug — resolve their tenant
   if (user && pathname === "/dashboard") {
-    const { data: tenant } = await supabase
-      .from("tenants")
-      .select("slug")
-      .eq("user_id", user.id)
-      .single();
-
-    const redirectUrl = new URL(
-      tenant ? `/dashboard/${tenant.slug}` : "/onboarding",
-      request.url
-    );
-    return NextResponse.redirect(redirectUrl);
+    const dest = await resolveRedirect(supabase, user.id);
+    return NextResponse.redirect(new URL(dest, request.url));
   }
 
   return response;

@@ -16,7 +16,7 @@ export default async function NewLocationPage({
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Nuevo local</h1>
+      <h1 className="text-2xl font-bold mb-6">Nueva ubicación</h1>
       <LocationForm action={action} />
     </div>
   );

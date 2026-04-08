@@ -19,7 +19,7 @@ insert into public.plans (name, slug, price_monthly, price_annual, features, dis
 
 -- First, create a test user in auth.users for the seed tenant
 -- This uses Supabase's auth admin to create a test user
-insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, confirmation_token, recovery_token)
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, confirmation_token, recovery_token, raw_app_meta_data, raw_user_meta_data, email_change, email_change_token_new, email_change_token_current, phone_change, phone_change_token)
 values (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   '00000000-0000-0000-0000-000000000000',
@@ -30,6 +30,13 @@ values (
   now(),
   now(),
   now(),
+  '',
+  '',
+  '{"provider": "email", "providers": ["email"]}',
+  '{}',
+  '',
+  '',
+  '',
   '',
   ''
 );
@@ -68,16 +75,28 @@ insert into public.locations (id, tenant_id, name, slug, address, city, timezone
   ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', 'Sede Ñuñoa', 'nunoa', 'Irarrázaval 567', 'Santiago', 'America/Santiago');
 
 -- --------------------------------------------------------
--- Resources
+-- Resources (tenant-scoped)
 -- --------------------------------------------------------
-insert into public.resources (id, location_id, name, description, type, hourly_rate, min_duration_hours, max_duration_hours) values
-  -- Providencia
-  ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Sala de Ensayo DJ', 'Sala equipada con CDJs Pioneer, mixer DJM-900, y monitores KRK', 'room', 15000, 1, 4),
-  ('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Estudio de Producción A', 'Producción musical con Pro Tools, interfaz Apollo, y monitores Genelec', 'room', 25000, 2, 8),
-  ('aaaa3333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Ciclorama', 'Ciclorama blanco 4x6m para fotografía y video', 'room', 35000, 2, 8),
-  -- Ñuñoa
-  ('bbbb1111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'Sala de Podcasting', 'Sala acústica con 4 micrófonos Shure SM7B y grabadora Rodecaster', 'room', 12000, 1, 4),
-  ('bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'Kit de Iluminación', 'Kit completo Godox con 3 luces, softboxes y trípodes', 'equipment', 8000, 1, 8);
+insert into public.resources (id, tenant_id, name, description, type, hourly_rate, min_duration_hours, max_duration_hours) values
+  ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Sala de Ensayo DJ', 'Sala equipada con CDJs Pioneer, mixer DJM-900, y monitores KRK', 'room', 15000, 1, 4),
+  ('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Estudio de Producción A', 'Producción musical con Pro Tools, interfaz Apollo, y monitores Genelec', 'room', 25000, 2, 8),
+  ('aaaa3333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Ciclorama', 'Ciclorama blanco 4x6m para fotografía y video', 'room', 35000, 2, 8),
+  ('bbbb1111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'Sala de Podcasting', 'Sala acústica con 4 micrófonos Shure SM7B y grabadora Rodecaster', 'room', 12000, 1, 4),
+  ('bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'Kit de Iluminación', 'Kit completo Godox con 3 luces, softboxes y trípodes', 'equipment', 8000, 1, 8);
+
+-- --------------------------------------------------------
+-- Resource ↔ Location assignments (many-to-many)
+-- --------------------------------------------------------
+insert into public.resource_locations (resource_id, location_id) values
+  -- Providencia resources
+  ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222'),
+  ('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222'),
+  ('aaaa3333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222'),
+  -- Ñuñoa resources
+  ('bbbb1111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333'),
+  ('bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333'),
+  -- Kit de Iluminación also available at Providencia (example of multi-location resource)
+  ('bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222');
 
 -- --------------------------------------------------------
 -- Availability (weekly recurring schedule)
@@ -142,6 +161,6 @@ insert into public.add_on_services (location_id, name, description, hourly_rate)
 insert into public.bookers (id, email, name, phone) values
   ('cccc1111-cccc-cccc-cccc-cccccccccccc', 'maria@example.com', 'María González', '+56912345678');
 
-insert into public.bookings (resource_id, booker_id, start_time, end_time, duration_hours, total_price, status) values
-  ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'cccc1111-cccc-cccc-cccc-cccccccccccc', now() + interval '2 days' + interval '14 hours', now() + interval '2 days' + interval '16 hours', 2, 30000, 'confirmed'),
-  ('bbbb1111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'cccc1111-cccc-cccc-cccc-cccccccccccc', now() + interval '5 days' + interval '10 hours', now() + interval '5 days' + interval '12 hours', 2, 24000, 'pending');
+insert into public.bookings (resource_id, location_id, booker_id, start_time, end_time, duration_hours, total_price, status) values
+  ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'cccc1111-cccc-cccc-cccc-cccccccccccc', now() + interval '2 days' + interval '14 hours', now() + interval '2 days' + interval '16 hours', 2, 30000, 'confirmed'),
+  ('bbbb1111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'cccc1111-cccc-cccc-cccc-cccccccccccc', now() + interval '5 days' + interval '10 hours', now() + interval '5 days' + interval '12 hours', 2, 24000, 'pending');

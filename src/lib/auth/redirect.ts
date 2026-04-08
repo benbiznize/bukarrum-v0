@@ -3,8 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 
 /**
  * Determines where to send a user after authentication.
- * - Has tenant → /dashboard/{slug}
- * - No tenant → /onboarding
+ * Walks the onboarding funnel: tenant → location → resource → dashboard.
  */
 export async function resolvePostAuthRedirect(
   supabase: SupabaseClient<Database>
@@ -17,10 +16,27 @@ export async function resolvePostAuthRedirect(
 
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("slug")
+    .select("id, slug")
     .eq("user_id", user.id)
     .single();
 
-  if (tenant) return `/dashboard/${tenant.slug}`;
-  return "/onboarding";
+  if (!tenant) return "/onboarding";
+
+  // Check if tenant has at least one location
+  const { count: locationCount } = await supabase
+    .from("locations")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenant.id);
+
+  if (!locationCount || locationCount === 0) return "/onboarding/location";
+
+  // Check if tenant has at least one resource assigned to a location
+  const { count: resourceCount } = await supabase
+    .from("resources")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenant.id);
+
+  if (!resourceCount || resourceCount === 0) return "/onboarding/resource";
+
+  return `/dashboard/${tenant.slug}`;
 }
