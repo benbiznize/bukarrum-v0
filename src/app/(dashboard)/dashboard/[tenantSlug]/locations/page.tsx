@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus } from "lucide-react";
+import { checkLocationLimit } from "@/lib/plans/check-limit";
 
 export default async function LocationsPage({
   params,
@@ -41,14 +42,30 @@ export default async function LocationsPage({
     .eq("tenant_id", tenant.id)
     .order("name");
 
+  const limitCheck = await checkLocationLimit(tenant.id);
+  const atLimit = !limitCheck.allowed;
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Ubicaciones</h1>
-        <Link href={`/dashboard/${tenantSlug}/locations/new`} className={buttonVariants()}>
+        <div>
+          <h1 className="text-2xl font-bold">Ubicaciones</h1>
+          {limitCheck.limit !== -1 && (
+            <p className="text-sm text-muted-foreground">
+              {limitCheck.current} de {limitCheck.limit} en tu plan {limitCheck.plan}
+            </p>
+          )}
+        </div>
+        {atLimit ? (
+          <span className="text-sm text-muted-foreground border rounded-md px-4 py-2">
+            Límite alcanzado
+          </span>
+        ) : (
+          <Link href={`/dashboard/${tenantSlug}/locations/new`} className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />
             Nueva ubicación
-        </Link>
+          </Link>
+        )}
       </div>
 
       {locations && locations.length > 0 ? (

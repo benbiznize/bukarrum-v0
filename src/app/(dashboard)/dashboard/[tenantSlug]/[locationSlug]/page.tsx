@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus } from "lucide-react";
+import { checkResourceLimit } from "@/lib/plans/check-limit";
 
 export default async function LocationDashboardPage({
   params,
@@ -61,6 +62,9 @@ export default async function LocationDashboardPage({
       minimumFractionDigits: 0,
     }).format(amount);
 
+  const limitCheck = await checkResourceLimit(tenant.id, location.id);
+  const atLimit = !limitCheck.allowed;
+
   const base = `/dashboard/${tenantSlug}/${locationSlug}`;
 
   return (
@@ -71,11 +75,22 @@ export default async function LocationDashboardPage({
           <p className="text-sm text-muted-foreground">
             {location.address}{location.city ? `, ${location.city}` : ""}
           </p>
+          {limitCheck.limit !== -1 && (
+            <p className="text-sm text-muted-foreground">
+              {limitCheck.current} de {limitCheck.limit} recursos en tu plan {limitCheck.plan}
+            </p>
+          )}
         </div>
-        <Link href={`${base}/resources/new`} className={buttonVariants()}>
+        {atLimit ? (
+          <span className="text-sm text-muted-foreground border rounded-md px-4 py-2">
+            Límite alcanzado
+          </span>
+        ) : (
+          <Link href={`${base}/resources/new`} className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />
             Nuevo recurso
-        </Link>
+          </Link>
+        )}
       </div>
 
       {resources && resources.length > 0 ? (

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
+import { checkResourceLimit } from "@/lib/plans/check-limit";
 
 type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -27,6 +28,10 @@ export async function createResource(
     .single();
 
   if (!tenant) return { error: "Tenant no encontrado" };
+
+  // Check plan limit before creating
+  const limitCheck = await checkResourceLimit(tenant.id, locationId);
+  if (!limitCheck.allowed) return { error: limitCheck.error };
 
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
