@@ -45,8 +45,9 @@ src/
 ├── app/
 │   ├── (marketing)/              # Landing, pricing, login — public
 │   ├── (dashboard)/              # Tenant admin panel — auth required
-│   │   └── [tenantSlug]/         # Scoped to tenant
-│   │       └── [locationSlug]/   # Scoped to location
+│   │   └── dashboard/            # URL prefix: /dashboard/...
+│   │       └── [tenantSlug]/     # Scoped to tenant
+│   │           └── [locationSlug]/ # Scoped to location
 │   ├── (booking)/                # Public booking pages
 │   │   └── [tenantSlug]/         # Single-page booking flow
 │   └── api/                      # Webhooks (MercadoPago IPN, etc.)
@@ -68,7 +69,7 @@ src/
 - Every tenant-owned table has a `tenant_id` column; location-scoped tables use `location_id` (chains to `tenant_id`)
 - RLS policies enforce tenant isolation at the database level
 - Supabase Auth handles both tenant users and booker sessions
-- URL structure: `[tenantSlug]/[locationSlug]` for dashboard; `[tenantSlug]` for public booking
+- URL structure: `/dashboard/[tenantSlug]/[locationSlug]` for admin; `/[tenantSlug]` for public booking
 - Proxy (Next.js 16 `proxy.ts`) protects `(dashboard)` routes — redirects unauthenticated users
 
 ### Data Patterns

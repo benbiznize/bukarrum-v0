@@ -1,0 +1,41 @@
+{
+  "common": {
+    "appName": "Bukarrum",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signUp": "Create account",
+    "signInWithGoogle": "Continue with Google",
+    "email": "Email",
+    "password": "Password"
+  },
+  "booking": {
+    "title": "Book",
+    "selectLocation": "Select a location",
+    "selectResource": "Select a resource",
+    "selectDate": "Select a date",
+    "selectTime": "Select a time",
+    "selectDuration": "Select duration",
+    "contactDetails": "Contact details",
+    "confirmBooking": "Confirm booking",
+    "hours": "hours",
+    "perHour": "per hour"
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "locations": "Locations",
+    "resources": "Resources",
+    "bookings": "Bookings",
+    "settings": "Settings",
+    "subscription": "Subscription"
+  }
+}
