@@ -16,7 +16,22 @@
     "signUp": "Create account",
     "signInWithGoogle": "Continue with Google",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "or continue with",
+    "onboardingTitle": "Create your business",
+    "onboardingSubtitle": "Set up your space on Bukarrum",
+    "businessName": "Business name",
+    "businessNamePlaceholder": "E.g.: Sonic Studio",
+    "selectPlan": "Select your plan",
+    "createBusiness": "Create business",
+    "slugPreview": "Your URL will be:",
+    "errorInvalidCredentials": "Invalid email or password",
+    "errorEmailTaken": "This email is already registered",
+    "errorSlugTaken": "This name is already taken, try another",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "checkEmail": "Check your email to confirm your account"
   },
   "booking": {
     "title": "Book",

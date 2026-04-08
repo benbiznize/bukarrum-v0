@@ -16,7 +16,22 @@
     "signUp": "Crear cuenta",
     "signInWithGoogle": "Continuar con Google",
     "email": "Correo electrónico",
-    "password": "Contraseña"
+    "password": "Contraseña",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "orContinueWith": "o continúa con",
+    "onboardingTitle": "Crea tu negocio",
+    "onboardingSubtitle": "Configura tu espacio en Bukarrum",
+    "businessName": "Nombre del negocio",
+    "businessNamePlaceholder": "Ej: Estudio Sónico",
+    "selectPlan": "Selecciona tu plan",
+    "createBusiness": "Crear negocio",
+    "slugPreview": "Tu URL será:",
+    "errorInvalidCredentials": "Correo o contraseña incorrectos",
+    "errorEmailTaken": "Este correo ya está registrado",
+    "errorSlugTaken": "Este nombre ya está en uso, intenta otro",
+    "errorGeneric": "Algo salió mal. Intenta nuevamente.",
+    "checkEmail": "Revisa tu correo para confirmar tu cuenta"
   },
   "booking": {
     "title": "Reservar",

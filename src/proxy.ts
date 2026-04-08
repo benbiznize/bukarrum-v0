@@ -34,10 +34,54 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname = request.nextUrl.pathname;
+
+  // Catch auth codes landing at root (Supabase redirects here after email verification)
+  const code = request.nextUrl.searchParams.get("code");
+  if (code && pathname === "/") {
+    const callbackUrl = new URL("/api/auth/callback", request.url);
+    callbackUrl.searchParams.set("code", code);
+    return NextResponse.redirect(callbackUrl);
+  }
+
+  // Redirect authenticated users away from auth pages
+  if (user && (pathname === "/login" || pathname === "/signup")) {
+    const { data: tenant } = await supabase
+      .from("tenants")
+      .select("slug")
+      .eq("user_id", user.id)
+      .single();
+
+    const redirectUrl = new URL(
+      tenant ? `/dashboard/${tenant.slug}` : "/onboarding",
+      request.url
+    );
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Protect dashboard routes — redirect to login if unauthenticated
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+  if (!user && pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Protect onboarding — must be authenticated
+  if (!user && pathname === "/onboarding") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Authenticated user hitting /dashboard without a slug — resolve their tenant
+  if (user && pathname === "/dashboard") {
+    const { data: tenant } = await supabase
+      .from("tenants")
+      .select("slug")
+      .eq("user_id", user.id)
+      .single();
+
+    const redirectUrl = new URL(
+      tenant ? `/dashboard/${tenant.slug}` : "/onboarding",
+      request.url
+    );
+    return NextResponse.redirect(redirectUrl);
   }
 
   return response;
