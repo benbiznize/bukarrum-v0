@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Database } from "@/lib/supabase/database.types";
@@ -7,6 +8,7 @@ import {
   sendBookingConfirmation,
   sendNewBookingNotification,
 } from "@/lib/resend/emails";
+import { rateLimit } from "@/lib/rate-limit";
 
 type DayOfWeek = Database["public"]["Enums"]["day_of_week"];
 
@@ -188,6 +190,12 @@ export async function createBooking(formData: FormData) {
 
   if (!resourceId || !locationId || !date || !startTime || !durationHours || !name || !email) {
     return { error: "Faltan datos requeridos" };
+  }
+
+  const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
+  const { success } = await rateLimit("booking", ip);
+  if (!success) {
+    return { error: "Demasiados intentos. Intenta de nuevo más tarde." };
   }
 
   const supabase = await createClient();

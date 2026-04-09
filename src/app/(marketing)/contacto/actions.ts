@@ -1,6 +1,8 @@
 "use server";
 
+import { headers } from "next/headers";
 import { getResend } from "@/lib/resend/client";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function sendContactEmail(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
@@ -14,6 +16,12 @@ export async function sendContactEmail(formData: FormData) {
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: "Correo electrónico inválido." };
+  }
+
+  const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
+  const { success } = await rateLimit("contact", ip);
+  if (!success) {
+    return { error: "Demasiados intentos. Intenta de nuevo más tarde." };
   }
 
   try {
