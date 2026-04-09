@@ -108,7 +108,8 @@
     "resourceNamePlaceholder": "E.g.: DJ Rehearsal Room",
     "descriptionPlaceholder": "Equipment, dimensions, details...",
     "type": "Type",
-    "ratePlaceholder": "15000"
+    "ratePlaceholder": "15000",
+    "notYourAccount": "Not your account?"
   },
   "booking": {
     "title": "Book",

@@ -90,11 +90,13 @@ export function ResourceForm({
             <Label htmlFor="type">{auth.type}</Label>
             <Select name="type" defaultValue={resource?.type ?? "room"}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue>
+                  {(value: string) => value === "equipment" ? common.equipment : common.room}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="room" label={common.room}>{common.room}</SelectItem>
-                <SelectItem value="equipment" label={common.equipment}>{common.equipment}</SelectItem>
+                <SelectItem value="room">{common.room}</SelectItem>
+                <SelectItem value="equipment">{common.equipment}</SelectItem>
               </SelectContent>
             </Select>
           </div>

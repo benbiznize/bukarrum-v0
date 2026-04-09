@@ -108,7 +108,8 @@
     "resourceNamePlaceholder": "Ej: Sala de Ensayo DJ",
     "descriptionPlaceholder": "Equipamiento, dimensiones, detalles...",
     "type": "Tipo",
-    "ratePlaceholder": "15000"
+    "ratePlaceholder": "15000",
+    "notYourAccount": "¿No es tu cuenta?"
   },
   "booking": {
     "title": "Reservar",
