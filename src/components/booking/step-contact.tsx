@@ -29,7 +29,9 @@ export function StepContact({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const totalPrice = (state.hourlyRate ?? 0) * (state.durationHours ?? 0);
+  const resourcePrice = (state.hourlyRate ?? 0) * (state.durationHours ?? 0);
+  const addOnsPrice = state.selectedAddOns.reduce((sum, a) => sum + a.price, 0);
+  const totalPrice = resourcePrice + addOnsPrice;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +45,7 @@ export function StepContact({
     formData.set("startTime", state.startTime!);
     formData.set("durationHours", String(state.durationHours));
     formData.set("timezone", state.locationTimezone!);
+    formData.set("addOns", JSON.stringify(state.selectedAddOns));
 
     const result = await createBooking(formData);
 
@@ -97,6 +100,17 @@ export function StepContact({
               {state.durationHours} {state.durationHours === 1 ? "hora" : "horas"}
             </span>
           </div>
+          <Separator />
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Recurso</span>
+            <span className="font-medium">{fmt.format(resourcePrice)}</span>
+          </div>
+          {state.selectedAddOns.map((a) => (
+            <div key={a.id} className="flex justify-between">
+              <span className="text-muted-foreground">{a.name}</span>
+              <span className="font-medium">{fmt.format(a.price)}</span>
+            </div>
+          ))}
           <Separator />
           <div className="flex justify-between font-semibold text-base">
             <span>Total</span>

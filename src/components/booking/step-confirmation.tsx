@@ -12,7 +12,9 @@ const fmt = new Intl.NumberFormat("es-CL", {
 });
 
 export function StepConfirmation({ state }: { state: BookingState }) {
-  const totalPrice = (state.hourlyRate ?? 0) * (state.durationHours ?? 0);
+  const resourcePrice = (state.hourlyRate ?? 0) * (state.durationHours ?? 0);
+  const addOnsPrice = state.selectedAddOns.reduce((sum, a) => sum + a.price, 0);
+  const totalPrice = resourcePrice + addOnsPrice;
 
   const dateDisplay = state.date
     ? new Date(state.date + "T12:00:00").toLocaleDateString("es-CL", {
@@ -56,6 +58,17 @@ export function StepConfirmation({ state }: { state: BookingState }) {
               {state.durationHours} {state.durationHours === 1 ? "hora" : "horas"}
             </span>
           </div>
+          <Separator />
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Recurso</span>
+            <span className="font-medium">{fmt.format(resourcePrice)}</span>
+          </div>
+          {state.selectedAddOns.map((a) => (
+            <div key={a.id} className="flex justify-between">
+              <span className="text-muted-foreground">{a.name}</span>
+              <span className="font-medium">{fmt.format(a.price)}</span>
+            </div>
+          ))}
           <Separator />
           <div className="flex justify-between font-semibold text-base">
             <span>Total</span>

@@ -8,10 +8,11 @@ import { StepResource } from "./step-resource";
 import { StepDate } from "./step-date";
 import { StepTime } from "./step-time";
 import { StepDuration } from "./step-duration";
+import { StepAddOns } from "./step-add-ons";
 import { StepContact } from "./step-contact";
 import { StepConfirmation } from "./step-confirmation";
 
-type Step = "location" | "resource" | "date" | "time" | "duration" | "contact" | "confirmation";
+type Step = "location" | "resource" | "date" | "time" | "duration" | "addons" | "contact" | "confirmation";
 
 export type BookingState = {
   step: Step;
@@ -28,6 +29,7 @@ export type BookingState = {
   startTime: string | null;
   availableUntil: string | null;
   durationHours: number | null;
+  selectedAddOns: { id: string; name: string; price: number }[];
   error: string | null;
 };
 
@@ -37,12 +39,13 @@ type Action =
   | { type: "SELECT_DATE"; date: string }
   | { type: "SELECT_TIME"; startTime: string; availableUntil: string }
   | { type: "SELECT_DURATION"; durationHours: number }
+  | { type: "SELECT_ADD_ONS"; addOns: { id: string; name: string; price: number }[] }
   | { type: "GO_BACK" }
   | { type: "SET_ERROR"; error: string }
   | { type: "BOOKING_COMPLETE" };
 
-const STEP_ORDER: Step[] = ["location", "resource", "date", "time", "duration", "contact", "confirmation"];
-const STEP_LABELS = ["Local", "Recurso", "Fecha", "Hora", "Duración", "Confirmar"];
+const STEP_ORDER: Step[] = ["location", "resource", "date", "time", "duration", "addons", "contact", "confirmation"];
+const STEP_LABELS = ["Local", "Recurso", "Fecha", "Hora", "Duración", "Extras", "Confirmar"];
 
 function reducer(state: BookingState, action: Action): BookingState {
   switch (action.type) {
@@ -85,14 +88,26 @@ function reducer(state: BookingState, action: Action): BookingState {
     case "SELECT_DURATION":
       return {
         ...state,
-        step: "contact",
+        step: "addons",
         durationHours: action.durationHours,
+        error: null,
+      };
+    case "SELECT_ADD_ONS":
+      return {
+        ...state,
+        step: "contact",
+        selectedAddOns: action.addOns,
         error: null,
       };
     case "GO_BACK": {
       const idx = STEP_ORDER.indexOf(state.step);
       if (idx <= 0) return state;
-      return { ...state, step: STEP_ORDER[idx - 1], error: null };
+      const prev = STEP_ORDER[idx - 1];
+      // Skip addons step on back if we auto-skipped it (no add-ons were selected)
+      if (prev === "addons" && state.selectedAddOns.length === 0) {
+        return { ...state, step: "duration", error: null };
+      }
+      return { ...state, step: prev, error: null };
     }
     case "SET_ERROR":
       return { ...state, error: action.error };
@@ -140,6 +155,7 @@ export function BookingFlow({
     startTime: null,
     availableUntil: null,
     durationHours: null,
+    selectedAddOns: [],
     error: null,
   });
 
@@ -205,6 +221,9 @@ export function BookingFlow({
       )}
       {state.step === "duration" && (
         <StepDuration state={state} dispatch={dispatch} />
+      )}
+      {state.step === "addons" && (
+        <StepAddOns state={state} dispatch={dispatch} />
       )}
       {state.step === "contact" && (
         <StepContact state={state} dispatch={dispatch} />

@@ -24,6 +24,20 @@ export async function getResourcesForLocation(locationId: string) {
   return data.map((row) => row.resource).filter(Boolean);
 }
 
+export async function getAddOnsForLocation(locationId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("add_on_services")
+    .select("id, name, description, hourly_rate")
+    .eq("location_id", locationId)
+    .eq("is_active", true)
+    .order("name");
+
+  if (error) return [];
+  return data;
+}
+
 export async function getAvailableDates(
   resourceId: string,
   timezone: string
@@ -187,7 +201,15 @@ export async function createBooking(formData: FormData) {
 
   if (!resource) return { error: "Recurso no encontrado" };
 
-  const totalPrice = resource.hourly_rate * durationHours;
+  // Parse add-ons from FormData
+  const addOnsRaw = formData.get("addOns") as string | null;
+  const addOns: { id: string; name: string; price: number }[] = addOnsRaw
+    ? JSON.parse(addOnsRaw)
+    : [];
+
+  const resourcePrice = resource.hourly_rate * durationHours;
+  const addOnsPrice = addOns.reduce((sum, a) => sum + a.price, 0);
+  const totalPrice = resourcePrice + addOnsPrice;
 
   // Compute timestamps
   const startISO = toTimestampTZ(date, startTime, timezone);
@@ -222,6 +244,17 @@ export async function createBooking(formData: FormData) {
       return { error: "BOOKING_CONFLICT" };
     }
     return { error: "Error al crear la reserva" };
+  }
+
+  // Insert add-on snapshots
+  if (addOns.length > 0 && bookingId) {
+    await supabase.from("booking_add_ons").insert(
+      addOns.map((a) => ({
+        booking_id: bookingId,
+        add_on_service_id: a.id,
+        price: a.price,
+      }))
+    );
   }
 
   // Send emails (fire-and-forget — don't block the response)
