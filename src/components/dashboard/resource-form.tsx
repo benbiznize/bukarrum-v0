@@ -41,7 +41,7 @@ export function ResourceForm({
     formData: FormData
   ) => Promise<{ error: string }>;
 }) {
-  const { dashboard, common } = useDict();
+  const { dashboard, common, auth } = useDict();
   const isEditing = !!resource;
   const [state, formAction, isPending] = useActionState(action, { error: "" });
   const [imageUrl, setImageUrl] = useState<string | null>(resource?.image_url ?? null);
@@ -87,7 +87,7 @@ export function ResourceForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="type">Tipo</Label>
+            <Label htmlFor="type">{auth.type}</Label>
             <Select name="type" defaultValue={resource?.type ?? "room"}>
               <SelectTrigger>
                 <SelectValue />

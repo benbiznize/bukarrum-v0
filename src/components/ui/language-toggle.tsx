@@ -1,31 +1,34 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 
-const LOCALE_LABELS: Record<string, string> = {
-  es: "EN",
-  en: "ES",
-};
+function readLocale(): string {
+  if (typeof document === "undefined") return "es";
+  const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
+  return match?.[1] ?? "es";
+}
 
 export function LanguageToggle() {
   const router = useRouter();
+  const [locale, setLocale] = useState<string | null>(null);
 
-  function getCurrentLocale(): string {
-    if (typeof document === "undefined") return "es";
-    const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
-    return match?.[1] ?? "es";
-  }
+  useEffect(() => {
+    setLocale(readLocale());
+  }, []);
 
   function toggle() {
-    const current = getCurrentLocale();
+    const current = readLocale();
     const next = current === "es" ? "en" : "es";
     document.cookie = `locale=${next}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    setLocale(next);
     router.refresh();
   }
 
-  const current = getCurrentLocale();
+  // Show only icon until client hydrates to avoid mismatch
+  const label = locale === null ? null : locale === "es" ? "EN" : "ES";
 
   return (
     <Button
@@ -35,7 +38,7 @@ export function LanguageToggle() {
       className="gap-1.5 text-muted-foreground"
     >
       <Globe className="h-4 w-4" />
-      {LOCALE_LABELS[current] ?? "EN"}
+      {label}
     </Button>
   );
 }

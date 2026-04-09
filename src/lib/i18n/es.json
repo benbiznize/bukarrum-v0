@@ -327,6 +327,7 @@
       "cta": "Comenzar gratis"
     },
     "pricing": {
+      "sectionLabel": "Precios",
       "title": "Planes simples, sin sorpresas",
       "subtitle": "Elige el plan que se adapta a tu estudio. Todos incluyen soporte por email.",
       "monthly": "Mensual",

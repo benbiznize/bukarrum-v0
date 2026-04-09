@@ -15,6 +15,7 @@ import {
 interface PricingContentProps {
   dict: {
     pricing: {
+      sectionLabel: string;
       title: string;
       subtitle: string;
       monthly: string;
@@ -59,7 +60,7 @@ export function PricingContent({ dict }: PricingContentProps) {
           <span
             className="text-xs font-medium uppercase tracking-[0.18em] text-primary"
           >
-            Pricing
+            {dict.pricing.sectionLabel}
           </span>
           <h1
             className="mt-3 text-3xl font-light text-white md:text-5xl"
