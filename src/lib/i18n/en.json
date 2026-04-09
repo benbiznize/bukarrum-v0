@@ -253,7 +253,46 @@
     "descriptionPlaceholder": "Equipment, dimensions, details...",
     "ratePlaceholder": "15000",
     "addOnNamePlaceholder": "E.g.: Sound Engineer",
-    "addOnDescPlaceholder": "Service details..."
+    "addOnDescPlaceholder": "Service details...",
+    "calendar": "Calendar",
+    "calendarView": {
+      "weekView": "Week",
+      "monthView": "Month",
+      "today": "Today",
+      "allLocations": "All locations",
+      "allResources": "All resources",
+      "noBookings": "No bookings for this period",
+      "timezone": "Timezone",
+      "showCancelled": "Show cancelled"
+    },
+    "analytics": "Analytics",
+    "analyticsView": {
+      "revenueOverTime": "Revenue over time",
+      "revenueByResource": "Revenue by resource",
+      "revenueByLocation": "Revenue by location",
+      "bookingVolume": "Booking volume",
+      "utilization": "Utilization",
+      "utilizationDesc": "Booked hours vs. available hours",
+      "topCustomers": "Top customers",
+      "totalRevenue": "Total revenue",
+      "totalBookings": "Total bookings",
+      "avgBookingValue": "Avg. booking value",
+      "utilizationRate": "Utilization rate",
+      "bookerName": "Customer",
+      "bookingCount": "Bookings",
+      "totalSpent": "Total spent",
+      "noLocation": "No location",
+      "noData": "No data for the selected period",
+      "upgradeTitle": "Unlock Analytics",
+      "upgradeDesc": "Access detailed business metrics with the Enterprise plan.",
+      "upgradeButton": "Upgrade plan"
+    },
+    "dateRange": {
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days",
+      "customRange": "Custom range"
+    }
   },
   "marketing": {
     "nav": {

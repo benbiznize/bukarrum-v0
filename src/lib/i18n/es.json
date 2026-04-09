@@ -253,7 +253,46 @@
     "descriptionPlaceholder": "Equipamiento, dimensiones, detalles...",
     "ratePlaceholder": "15000",
     "addOnNamePlaceholder": "Ej: Ingeniero de Sonido",
-    "addOnDescPlaceholder": "Detalles del servicio..."
+    "addOnDescPlaceholder": "Detalles del servicio...",
+    "calendar": "Calendario",
+    "calendarView": {
+      "weekView": "Semana",
+      "monthView": "Mes",
+      "today": "Hoy",
+      "allLocations": "Todas las ubicaciones",
+      "allResources": "Todos los recursos",
+      "noBookings": "Sin reservas para este período",
+      "timezone": "Zona horaria",
+      "showCancelled": "Mostrar canceladas"
+    },
+    "analytics": "Analíticas",
+    "analyticsView": {
+      "revenueOverTime": "Ingresos en el tiempo",
+      "revenueByResource": "Ingresos por recurso",
+      "revenueByLocation": "Ingresos por ubicación",
+      "bookingVolume": "Volumen de reservas",
+      "utilization": "Utilización",
+      "utilizationDesc": "Horas reservadas vs. disponibles",
+      "topCustomers": "Mejores clientes",
+      "totalRevenue": "Ingresos totales",
+      "totalBookings": "Total reservas",
+      "avgBookingValue": "Valor promedio",
+      "utilizationRate": "Tasa de ocupación",
+      "bookerName": "Cliente",
+      "bookingCount": "Reservas",
+      "totalSpent": "Gasto total",
+      "noLocation": "Sin ubicación",
+      "noData": "No hay datos para el período seleccionado",
+      "upgradeTitle": "Desbloquea Analíticas",
+      "upgradeDesc": "Accede a métricas detalladas de tu negocio con el plan Enterprise.",
+      "upgradeButton": "Mejorar plan"
+    },
+    "dateRange": {
+      "last7Days": "Últimos 7 días",
+      "last30Days": "Últimos 30 días",
+      "last90Days": "Últimos 90 días",
+      "customRange": "Rango personalizado"
+    }
   },
   "marketing": {
     "nav": {

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { getPlanFeatures } from "@/lib/plans/check-limit";
 
 export default async function TenantDashboardLayout({
   children,
@@ -28,12 +29,15 @@ export default async function TenantDashboardLayout({
 
   if (!tenant) redirect("/onboarding");
 
-  // Fetch locations for sidebar navigation
-  const { data: locations } = await supabase
-    .from("locations")
-    .select("id, name, slug, is_active")
-    .eq("tenant_id", tenant.id)
-    .order("name");
+  // Fetch locations and plan features in parallel
+  const [{ data: locations }, plan] = await Promise.all([
+    supabase
+      .from("locations")
+      .select("id, name, slug, is_active")
+      .eq("tenant_id", tenant.id)
+      .order("name"),
+    getPlanFeatures(tenant.id),
+  ]);
 
   return (
     <div className="flex min-h-screen">
@@ -41,6 +45,7 @@ export default async function TenantDashboardLayout({
         tenant={tenant}
         locations={locations ?? []}
         tenantSlug={tenantSlug}
+        analyticsEnabled={plan?.features.analytics ?? false}
       />
       <main className="flex-1 overflow-auto">
         {children}

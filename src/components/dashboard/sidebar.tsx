@@ -6,6 +6,8 @@ import {
   MapPin,
   Box,
   CalendarDays,
+  CalendarRange,
+  BarChart3,
   Settings,
   LayoutDashboard,
   Plus,
@@ -32,10 +34,12 @@ export function DashboardSidebar({
   tenant,
   locations,
   tenantSlug,
+  analyticsEnabled: _analyticsEnabled = false,
 }: {
   tenant: Tenant;
   locations: Location[];
   tenantSlug: string;
+  analyticsEnabled?: boolean;
 }) {
   const { dashboard, common } = useDict();
   const pathname = usePathname();
@@ -65,6 +69,18 @@ export function DashboardSidebar({
             icon={CalendarDays}
             label={dashboard.bookings}
             active={pathname.startsWith(`${base}/bookings`)}
+          />
+          <SidebarLink
+            href={`${base}/calendar`}
+            icon={CalendarRange}
+            label={dashboard.calendar}
+            active={pathname.startsWith(`${base}/calendar`)}
+          />
+          <SidebarLink
+            href={`${base}/analytics`}
+            icon={BarChart3}
+            label={dashboard.analytics}
+            active={pathname.startsWith(`${base}/analytics`)}
           />
           <SidebarLink
             href={`${base}/locations`}
