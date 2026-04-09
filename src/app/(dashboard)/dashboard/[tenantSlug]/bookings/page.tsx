@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export const metadata: Metadata = { title: "Reservas" };
 import {
@@ -98,7 +99,8 @@ export default async function BookingsPage({
     });
   };
 
-  const dict = await getDictionary("es");
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const d = dict.dashboard;
   const statusLabels = d.statusLabels as Record<string, string>;
 

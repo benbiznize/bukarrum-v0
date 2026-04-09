@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/get-locale";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { FeaturesSection } from "@/components/marketing/features-section";
 import { HowItWorksSection } from "@/components/marketing/how-it-works-section";
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const dict = await getDictionary("es");
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
 
   return (
     <main>

@@ -29,10 +29,43 @@ async function resolveRedirect(supabase: SupabaseClient, userId: string): Promis
   return `/dashboard/${tenant.slug}`;
 }
 
+const SUPPORTED_LOCALES = ["es", "en"] as const;
+const DEFAULT_LOCALE = "es";
+
+function detectLocale(request: NextRequest): string {
+  // 1. Explicit cookie
+  const cookieLocale = request.cookies.get("locale")?.value;
+  if (cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale as typeof SUPPORTED_LOCALES[number])) {
+    return cookieLocale;
+  }
+
+  // 2. Accept-Language header
+  const acceptLang = request.headers.get("accept-language") ?? "";
+  for (const part of acceptLang.split(",")) {
+    const lang = part.trim().split(";")[0].split("-")[0].toLowerCase();
+    if (SUPPORTED_LOCALES.includes(lang as typeof SUPPORTED_LOCALES[number])) {
+      return lang;
+    }
+  }
+
+  // 3. Default
+  return DEFAULT_LOCALE;
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
+
+  // Set locale cookie if not present
+  const locale = detectLocale(request);
+  if (!request.cookies.get("locale")) {
+    response.cookies.set("locale", locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: "lax",
+    });
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

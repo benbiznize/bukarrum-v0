@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/get-locale";
 import { ContactForm } from "@/components/marketing/contact-form";
 
 export const metadata: Metadata = {
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactoPage() {
-  const dict = await getDictionary("es");
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
 
   return (
     <main className="py-24">

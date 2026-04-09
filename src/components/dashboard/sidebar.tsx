@@ -11,6 +11,7 @@ import {
   Plus,
 } from "lucide-react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { LanguageToggle } from "@/components/ui/language-toggle";
 import { cn } from "@/lib/utils";
 import { useDict } from "@/lib/i18n/dict-context";
 
@@ -119,8 +120,9 @@ export function DashboardSidebar({
       </nav>
 
       {/* Footer */}
-      <div className="border-t px-4 py-3">
+      <div className="border-t px-4 py-3 flex items-center justify-between">
         <SignOutButton />
+        <LanguageToggle />
       </div>
     </aside>
   );

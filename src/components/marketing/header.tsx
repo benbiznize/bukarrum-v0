@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { LanguageToggle } from "@/components/ui/language-toggle";
 import { MobileNav } from "./mobile-nav";
 
 interface MarketingHeaderProps {
@@ -45,6 +46,7 @@ export function MarketingHeader({ dict }: MarketingHeaderProps) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <LanguageToggle />
           <Button
             variant="ghost"
             size="sm"

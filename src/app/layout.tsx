@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit } from "next/font/google";
+import { cookies } from "next/headers";
 import { AuthHashListener } from "@/components/auth/auth-hash-listener";
-import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getDictionary, type Locale, defaultLocale } from "@/lib/i18n/dictionaries";
 import { DictProvider } from "@/lib/i18n/dict-context";
 import "./globals.css";
 
@@ -25,11 +26,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const dict = await getDictionary("es");
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("locale")?.value as Locale) || defaultLocale;
+  const dict = await getDictionary(locale);
 
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${fraunces.variable} ${outfit.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

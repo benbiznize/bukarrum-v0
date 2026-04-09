@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export const metadata: Metadata = { title: "Ubicaciones" };
 import { buttonVariants } from "@/components/ui/button";
@@ -49,7 +50,8 @@ export default async function LocationsPage({
   const limitCheck = await checkLocationLimit(tenant.id);
   const atLimit = !limitCheck.allowed;
 
-  const dict = await getDictionary("es");
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const d = dict.dashboard;
   const c = dict.common;
 

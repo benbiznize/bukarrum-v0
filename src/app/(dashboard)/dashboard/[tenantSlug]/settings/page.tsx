@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export const metadata: Metadata = { title: "Configuración" };
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +58,8 @@ export default async function SettingsPage({
       minimumFractionDigits: 0,
     }).format(amount);
 
-  const dict = await getDictionary("es");
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const d = dict.dashboard;
   const statusLabels = d.subscriptionStatusLabels as Record<string, string>;
 
