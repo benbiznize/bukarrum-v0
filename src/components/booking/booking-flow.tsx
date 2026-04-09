@@ -109,6 +109,7 @@ type Location = {
   address: string | null;
   city: string | null;
   timezone: string;
+  image_url: string | null;
 };
 
 export function BookingFlow({

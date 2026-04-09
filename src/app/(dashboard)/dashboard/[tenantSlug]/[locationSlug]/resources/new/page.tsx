@@ -50,7 +50,7 @@ export default async function NewResourcePage({
       <h1 className="text-2xl font-bold mb-6">
         Nuevo recurso — {location.name}
       </h1>
-      <ResourceForm action={action} />
+      <ResourceForm tenantId={tenant.id} action={action} />
     </div>
   );
 }

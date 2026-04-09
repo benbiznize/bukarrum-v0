@@ -43,6 +43,8 @@ export async function createResource(
   if (!name) return { error: "El nombre es requerido" };
   if (isNaN(hourlyRate) || hourlyRate <= 0) return { error: "Tarifa inválida" };
 
+  const imageUrl = (formData.get("image_url") as string)?.trim() || null;
+
   // Create the resource (tenant-scoped)
   const { data: resource, error } = await supabase
     .from("resources")
@@ -54,6 +56,7 @@ export async function createResource(
       hourly_rate: hourlyRate,
       min_duration_hours: minDuration,
       max_duration_hours: maxDuration,
+      image_url: imageUrl,
     })
     .select("id")
     .single();
@@ -95,6 +98,8 @@ export async function updateResource(
   if (!name) return { error: "El nombre es requerido" };
   if (isNaN(hourlyRate) || hourlyRate <= 0) return { error: "Tarifa inválida" };
 
+  const imageUrl = (formData.get("image_url") as string)?.trim() || null;
+
   const { error } = await supabase
     .from("resources")
     .update({
@@ -105,6 +110,7 @@ export async function updateResource(
       min_duration_hours: minDuration,
       max_duration_hours: maxDuration,
       is_active: isActive,
+      image_url: imageUrl,
     })
     .eq("id", resourceId);
 

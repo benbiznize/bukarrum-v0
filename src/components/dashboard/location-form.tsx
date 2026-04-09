@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "./image-upload";
 
 type LocationData = {
   id?: string;
@@ -14,14 +15,17 @@ type LocationData = {
   city: string | null;
   phone: string | null;
   timezone: string;
+  image_url: string | null;
   is_active: boolean;
 };
 
 export function LocationForm({
   location,
+  tenantId,
   action,
 }: {
   location?: LocationData;
+  tenantId: string;
   action: (
     prev: { error: string },
     formData: FormData
@@ -29,6 +33,7 @@ export function LocationForm({
 }) {
   const isEditing = !!location;
   const [state, formAction, isPending] = useActionState(action, { error: "" });
+  const [imageUrl, setImageUrl] = useState<string | null>(location?.image_url ?? null);
 
   return (
     <Card className="max-w-lg">
@@ -37,6 +42,17 @@ export function LocationForm({
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label>Imagen</Label>
+            <ImageUpload
+              tenantId={tenantId}
+              value={imageUrl}
+              onChange={setImageUrl}
+              folder="locations"
+            />
+            <input type="hidden" name="image_url" value={imageUrl ?? ""} />
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="name">Nombre</Label>
             <Input

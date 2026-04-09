@@ -22,7 +22,7 @@ export default async function BookingPage({
   // Fetch active locations that have at least one active resource assigned
   const { data: locationRows } = await supabase
     .from("locations")
-    .select("id, name, address, city, timezone")
+    .select("id, name, address, city, timezone, image_url")
     .eq("tenant_id", tenant.id)
     .eq("is_active", true)
     .order("name");

@@ -20,6 +20,15 @@ export default async function EditResourcePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", tenantSlug)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!tenant) redirect("/login");
+
   const { data: resource } = await supabase
     .from("resources")
     .select("*")
@@ -42,7 +51,7 @@ export default async function EditResourcePage({
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Editar recurso</h1>
-      <ResourceForm resource={resource} action={action} />
+      <ResourceForm resource={resource} tenantId={tenant.id} action={action} />
     </div>
   );
 }

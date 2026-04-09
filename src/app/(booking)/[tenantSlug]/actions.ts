@@ -15,7 +15,7 @@ export async function getResourcesForLocation(locationId: string) {
 
   const { data, error } = await supabase
     .from("resource_locations")
-    .select("resource:resources!inner(id, name, description, type, hourly_rate, min_duration_hours, max_duration_hours)")
+    .select("resource:resources!inner(id, name, description, type, hourly_rate, min_duration_hours, max_duration_hours, image_url)")
     .eq("location_id", locationId)
     .eq("resource.is_active", true);
 

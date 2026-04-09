@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 
@@ -9,6 +10,7 @@ type Location = {
   address: string | null;
   city: string | null;
   timezone: string;
+  image_url: string | null;
 };
 
 export function StepLocation({
@@ -36,9 +38,22 @@ export function StepLocation({
             }
           >
             <CardContent className="flex items-center gap-3 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                <MapPin className="h-5 w-5 text-muted-foreground" />
-              </div>
+              {loc.image_url ? (
+                <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden">
+                  <Image
+                    src={loc.image_url}
+                    alt={loc.name}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
               <div>
                 <p className="font-medium">{loc.name}</p>
                 {loc.address && (

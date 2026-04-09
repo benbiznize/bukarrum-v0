@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "./image-upload";
 
 type ResourceData = {
   id?: string;
@@ -23,14 +24,17 @@ type ResourceData = {
   hourly_rate: number;
   min_duration_hours: number;
   max_duration_hours: number;
+  image_url: string | null;
   is_active: boolean;
 };
 
 export function ResourceForm({
   resource,
+  tenantId,
   action,
 }: {
   resource?: ResourceData;
+  tenantId: string;
   action: (
     prev: { error: string },
     formData: FormData
@@ -38,6 +42,7 @@ export function ResourceForm({
 }) {
   const isEditing = !!resource;
   const [state, formAction, isPending] = useActionState(action, { error: "" });
+  const [imageUrl, setImageUrl] = useState<string | null>(resource?.image_url ?? null);
 
   return (
     <Card className="max-w-lg">
@@ -46,6 +51,17 @@ export function ResourceForm({
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label>Imagen</Label>
+            <ImageUpload
+              tenantId={tenantId}
+              value={imageUrl}
+              onChange={setImageUrl}
+              folder="resources"
+            />
+            <input type="hidden" name="image_url" value={imageUrl ?? ""} />
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="name">Nombre</Label>
             <Input

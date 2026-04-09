@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +15,7 @@ type Resource = {
   hourly_rate: number;
   min_duration_hours: number;
   max_duration_hours: number;
+  image_url: string | null;
 };
 
 const fmt = new Intl.NumberFormat("es-CL", {
@@ -79,21 +81,35 @@ export function StepResource({
               })
             }
           >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium">{res.name}</p>
-                  {res.description && (
-                    <p className="text-sm text-muted-foreground mt-1">{res.description}</p>
-                  )}
+            <CardContent className="p-0 overflow-hidden">
+              {res.image_url && (
+                <div className="relative w-full aspect-[3/1]">
+                  <Image
+                    src={res.image_url}
+                    alt={res.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 512px) 100vw, 512px"
+                    unoptimized
+                  />
                 </div>
-                <Badge variant="secondary" className="ml-2 shrink-0">
-                  {res.type === "room" ? "Sala" : "Equipo"}
-                </Badge>
+              )}
+              <div className="p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium">{res.name}</p>
+                    {res.description && (
+                      <p className="text-sm text-muted-foreground mt-1">{res.description}</p>
+                    )}
+                  </div>
+                  <Badge variant="secondary" className="ml-2 shrink-0">
+                    {res.type === "room" ? "Sala" : "Equipo"}
+                  </Badge>
+                </div>
+                <p className="text-sm font-medium text-primary mt-2">
+                  {fmt.format(res.hourly_rate)} / hora
+                </p>
               </div>
-              <p className="text-sm font-medium text-primary mt-2">
-                {fmt.format(res.hourly_rate)} / hora
-              </p>
             </CardContent>
           </Card>
         ))}

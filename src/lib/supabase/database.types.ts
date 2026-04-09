@@ -249,6 +249,7 @@ export type Database = {
           city: string | null
           created_at: string
           id: string
+          image_url: string | null
           is_active: boolean
           name: string
           phone: string | null
@@ -262,6 +263,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name: string
           phone?: string | null
@@ -275,6 +277,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name?: string
           phone?: string | null

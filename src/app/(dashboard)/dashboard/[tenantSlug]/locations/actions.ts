@@ -45,6 +45,8 @@ export async function createLocation(tenantSlug: string, formData: FormData) {
   const slug = slugify(name);
   if (!slug) return { error: "Nombre inválido" };
 
+  const imageUrl = (formData.get("image_url") as string)?.trim() || null;
+
   const { error } = await supabase.from("locations").insert({
     tenant_id: tenant.id,
     name,
@@ -53,6 +55,7 @@ export async function createLocation(tenantSlug: string, formData: FormData) {
     city,
     phone,
     timezone,
+    image_url: imageUrl,
   });
 
   if (error) {
@@ -86,9 +89,11 @@ export async function updateLocation(
 
   if (!name) return { error: "El nombre es requerido" };
 
+  const imageUrl = (formData.get("image_url") as string)?.trim() || null;
+
   const { error } = await supabase
     .from("locations")
-    .update({ name, address, city, phone, timezone, is_active: isActive })
+    .update({ name, address, city, phone, timezone, is_active: isActive, image_url: imageUrl })
     .eq("id", locationId);
 
   if (error) {

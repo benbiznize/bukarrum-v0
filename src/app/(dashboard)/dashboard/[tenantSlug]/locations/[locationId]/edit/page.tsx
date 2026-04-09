@@ -11,6 +11,20 @@ export default async function EditLocationPage({
   const { tenantSlug, locationId } = await params;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", tenantSlug)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!tenant) redirect("/login");
+
   const { data: location } = await supabase
     .from("locations")
     .select("*")
@@ -28,7 +42,7 @@ export default async function EditLocationPage({
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Editar ubicación</h1>
-      <LocationForm location={location} action={action} />
+      <LocationForm location={location} tenantId={tenant.id} action={action} />
     </div>
   );
 }
