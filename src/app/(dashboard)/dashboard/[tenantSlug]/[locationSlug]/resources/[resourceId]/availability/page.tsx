@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { AvailabilityEditor } from "@/components/dashboard/availability-editor";
+
+export const metadata: Metadata = { title: "Disponibilidad" };
 import { saveAvailability } from "./actions";
 
 export default async function AvailabilityPage({

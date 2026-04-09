@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+export const metadata: Metadata = { title: "Suscripción" };
 import { CheckCircle2, Clock } from "lucide-react";
 
 export default async function SubscriptionReturnPage({

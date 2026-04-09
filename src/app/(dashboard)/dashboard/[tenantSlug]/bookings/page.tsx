@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = { title: "Reservas" };
 import {
   Table,
   TableBody,

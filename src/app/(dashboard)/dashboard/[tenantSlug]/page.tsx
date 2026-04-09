@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Box, CalendarDays, DollarSign } from "lucide-react";
+
+export const metadata: Metadata = { title: "Resumen" };
 
 export default async function TenantDashboardPage({
   params,

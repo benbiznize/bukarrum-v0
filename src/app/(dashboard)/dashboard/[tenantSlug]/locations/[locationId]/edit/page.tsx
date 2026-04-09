@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { LocationForm } from "@/components/dashboard/location-form";
+
+export const metadata: Metadata = { title: "Editar ubicación" };
 import { updateLocation } from "../../actions";
 
 export default async function EditLocationPage({

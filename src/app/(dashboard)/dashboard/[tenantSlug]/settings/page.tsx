@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = { title: "Configuración" };
 import { Badge } from "@/components/ui/badge";
 import { SubscriptionActions } from "@/components/dashboard/subscription-actions";
 

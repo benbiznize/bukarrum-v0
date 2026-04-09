@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { ResourceForm } from "@/components/dashboard/resource-form";
+
+export const metadata: Metadata = { title: "Editar recurso" };
 import { updateResource } from "../../actions";
 
 export default async function EditResourcePage({
