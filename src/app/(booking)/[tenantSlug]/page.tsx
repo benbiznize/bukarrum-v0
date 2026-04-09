@@ -1,6 +1,26 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { BookingFlow } from "@/components/booking/booking-flow";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tenantSlug: string }>;
+}): Promise<Metadata> {
+  const { tenantSlug } = await params;
+  const supabase = await createClient();
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("name")
+    .eq("slug", tenantSlug)
+    .single();
+
+  return {
+    title: tenant ? `Reservar en ${tenant.name} — Bukarrum` : "Reservar — Bukarrum",
+    description: tenant ? `Reserva tu espacio en ${tenant.name}` : undefined,
+  };
+}
 
 export default async function BookingPage({
   params,
