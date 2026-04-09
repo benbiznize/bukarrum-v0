@@ -12,8 +12,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { createFirstLocation } from "@/app/(auth)/onboarding/location/actions";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function OnboardingLocationForm() {
+  const { auth, common } = useDict();
   const [state, formAction, isPending] = useActionState(
     async (_prev: { error: string }, formData: FormData) => {
       const result = await createFirstLocation(formData);
@@ -25,47 +27,47 @@ export function OnboardingLocationForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Agrega tu primera ubicación</CardTitle>
+        <CardTitle className="text-2xl">{auth.onboardingLocationTitle}</CardTitle>
         <CardDescription>
-          ¿Dónde se encuentra tu estudio o local?
+          {auth.onboardingLocationSubtitle}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre de la ubicación</Label>
+            <Label htmlFor="name">{auth.locationName}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Sede Providencia"
+              placeholder={auth.locationNamePlaceholder}
               required
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="address">Dirección</Label>
+            <Label htmlFor="address">{common.address}</Label>
             <Input
               id="address"
               name="address"
-              placeholder="Ej: Av. Providencia 1234"
+              placeholder={auth.addressPlaceholder}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="city">Ciudad</Label>
+              <Label htmlFor="city">{common.city}</Label>
               <Input
                 id="city"
                 name="city"
-                placeholder="Ej: Santiago"
+                placeholder={auth.cityPlaceholder}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">{common.phone}</Label>
               <Input
                 id="phone"
                 name="phone"
-                placeholder="+56 9 1234 5678"
+                placeholder={auth.phonePlaceholder}
               />
             </div>
           </div>
@@ -75,11 +77,11 @@ export function OnboardingLocationForm() {
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending ? "Creando..." : "Continuar"}
+            {isPending ? common.creating : auth.continue}
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Paso 2 de 3
+            {auth.step2of3}
           </p>
         </form>
       </CardContent>

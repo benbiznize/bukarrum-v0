@@ -13,9 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function ResetPasswordForm() {
   const router = useRouter();
+  const { auth, common } = useDict();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function ResetPasswordForm() {
     setError(null);
 
     if (password !== confirm) {
-      setError("Las contraseñas no coinciden");
+      setError(auth.passwordsNoMatch);
       return;
     }
 
@@ -38,7 +40,7 @@ export function ResetPasswordForm() {
     setLoading(false);
 
     if (error) {
-      setError("Algo salió mal. Intenta nuevamente.");
+      setError(auth.errorGeneric);
       return;
     }
 
@@ -49,17 +51,17 @@ export function ResetPasswordForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Nueva contraseña</CardTitle>
-        <CardDescription>Ingresa tu nueva contraseña</CardDescription>
+        <CardTitle className="text-2xl">{auth.resetPasswordTitle}</CardTitle>
+        <CardDescription>{auth.resetPasswordSubtitle}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="password">Nueva contraseña</Label>
+            <Label htmlFor="password">{auth.newPassword}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Mínimo 6 caracteres"
+              placeholder={auth.minChars}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={6}
@@ -67,7 +69,7 @@ export function ResetPasswordForm() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="confirm">Confirmar contraseña</Label>
+            <Label htmlFor="confirm">{auth.confirmPassword}</Label>
             <Input
               id="confirm"
               type="password"
@@ -81,7 +83,7 @@ export function ResetPasswordForm() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Guardando..." : "Restablecer contraseña"}
+            {loading ? common.saving : auth.resetPassword}
           </Button>
         </form>
       </CardContent>

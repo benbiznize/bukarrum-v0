@@ -12,18 +12,21 @@ import { MoreHorizontal } from "lucide-react";
 import { updateBookingStatus } from "@/app/(dashboard)/dashboard/[tenantSlug]/bookings/actions";
 import type { Database } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type BookingStatus = Database["public"]["Enums"]["booking_status"];
 
-const STATUS_TRANSITIONS: Record<BookingStatus, { label: string; value: BookingStatus }[]> = {
+type TransitionDef = { labelKey: "confirm" | "cancel" | "complete" | "noShow"; value: BookingStatus };
+
+const STATUS_TRANSITIONS: Record<BookingStatus, TransitionDef[]> = {
   pending: [
-    { label: "Confirmar", value: "confirmed" },
-    { label: "Cancelar", value: "cancelled" },
+    { labelKey: "confirm", value: "confirmed" },
+    { labelKey: "cancel", value: "cancelled" },
   ],
   confirmed: [
-    { label: "Marcar completada", value: "completed" },
-    { label: "Marcar no show", value: "no_show" },
-    { label: "Cancelar", value: "cancelled" },
+    { labelKey: "complete", value: "completed" },
+    { labelKey: "noShow", value: "no_show" },
+    { labelKey: "cancel", value: "cancelled" },
   ],
   cancelled: [],
   completed: [],
@@ -39,6 +42,7 @@ export function BookingStatusActions({
   currentStatus: BookingStatus;
   tenantSlug: string;
 }) {
+  const { dashboard } = useDict();
   const [isPending, startTransition] = useTransition();
   const transitions = STATUS_TRANSITIONS[currentStatus];
 
@@ -62,7 +66,7 @@ export function BookingStatusActions({
               });
             }}
           >
-            {t.label}
+            {dashboard.bookingActions[t.labelKey]}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

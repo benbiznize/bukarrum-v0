@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Reservas" };
 import {
@@ -14,13 +15,7 @@ import {
 } from "@/components/ui/table";
 import { BookingStatusActions } from "@/components/dashboard/booking-status-actions";
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "Pendiente",
-  confirmed: "Confirmada",
-  cancelled: "Cancelada",
-  completed: "Completada",
-  no_show: "No show",
-};
+// STATUS_LABELS loaded from dictionary in component below
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   pending: "outline",
@@ -93,8 +88,8 @@ export default async function BookingsPage({
     }).format(amount);
 
   const formatDateTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleDateString("es-CL", {
+    const dt = new Date(iso);
+    return dt.toLocaleDateString("es-CL", {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -103,10 +98,14 @@ export default async function BookingsPage({
     });
   };
 
+  const dict = await getDictionary("es");
+  const d = dict.dashboard;
+  const statusLabels = d.statusLabels as Record<string, string>;
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Reservas</h1>
+        <h1 className="text-2xl font-bold">{d.bookings}</h1>
       </div>
 
       {bookings && bookings.length > 0 ? (
@@ -114,13 +113,13 @@ export default async function BookingsPage({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Fecha/Hora</TableHead>
-                <TableHead>Recurso</TableHead>
-                <TableHead>Ubicación</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Duración</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>{d.dateTime}</TableHead>
+                <TableHead>{d.resources}</TableHead>
+                <TableHead>{d.locations}</TableHead>
+                <TableHead>{d.client}</TableHead>
+                <TableHead>{dict.booking.duration}</TableHead>
+                <TableHead>{dict.common.total}</TableHead>
+                <TableHead>{dict.common.status}</TableHead>
                 <TableHead className="w-[50px]" />
               </TableRow>
             </TableHeader>
@@ -161,7 +160,7 @@ export default async function BookingsPage({
                     <TableCell>{formatCLP(booking.total_price)}</TableCell>
                     <TableCell>
                       <Badge variant={STATUS_VARIANT[booking.status] ?? "outline"}>
-                        {STATUS_LABELS[booking.status] ?? booking.status}
+                        {statusLabels[booking.status] ?? booking.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -180,7 +179,7 @@ export default async function BookingsPage({
       ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed py-12">
           <p className="text-muted-foreground">
-            Aún no hay reservas registradas
+            {d.noBookingsYet}
           </p>
         </div>
       )}

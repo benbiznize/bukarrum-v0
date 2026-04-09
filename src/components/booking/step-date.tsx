@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAvailableDates } from "@/app/(booking)/[tenantSlug]/actions";
 import { es } from "react-day-picker/locale";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function StepDate({
   resourceId,
@@ -15,6 +16,7 @@ export function StepDate({
   timezone: string;
   dispatch: React.Dispatch<{ type: "SELECT_DATE"; date: string }>;
 }) {
+  const { booking } = useDict();
   const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +32,7 @@ export function StepDate({
   }
 
   if (availableDates.size === 0) {
-    return <p className="text-muted-foreground text-center py-8">No hay disponibilidad para este recurso</p>;
+    return <p className="text-muted-foreground text-center py-8">{booking.noAvailability}</p>;
   }
 
   const today = new Date();
@@ -39,7 +41,7 @@ export function StepDate({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Selecciona una fecha</h2>
+      <h2 className="text-lg font-semibold mb-4">{booking.selectDate}</h2>
       <div className="flex justify-center">
         <Calendar
           mode="single"

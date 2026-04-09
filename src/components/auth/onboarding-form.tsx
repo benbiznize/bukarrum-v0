@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import type { PlanFeatures } from "@/lib/types/plan-features";
 import type { Json } from "@/lib/supabase/database.types";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type Plan = {
   id: string;
@@ -43,6 +44,7 @@ function formatCLP(amount: number): string {
 }
 
 export function OnboardingForm({ plans }: { plans: Plan[] }) {
+  const { auth, common } = useDict();
   const [name, setName] = useState("");
   const [selectedPlan, setSelectedPlan] = useState(plans[0]?.id ?? "");
   const [state, formAction, isPending] = useActionState(
@@ -59,25 +61,25 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
   return (
     <Card className="max-w-lg mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Crea tu negocio</CardTitle>
-        <CardDescription>Configura tu espacio en Bukarrum</CardDescription>
+        <CardTitle className="text-2xl">{auth.onboardingTitle}</CardTitle>
+        <CardDescription>{auth.onboardingSubtitle}</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-6">
           {/* Business name */}
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre del negocio</Label>
+            <Label htmlFor="name">{auth.businessName}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Estudio Sónico"
+              placeholder={auth.businessNamePlaceholder}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
             {slug && (
               <p className="text-xs text-muted-foreground">
-                Tu URL será:{" "}
+                {auth.slugPreview}{" "}
                 <span className="font-mono text-foreground">
                   bukarrum.com/{slug}
                 </span>
@@ -87,7 +89,7 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
 
           {/* Plan selection */}
           <div className="grid gap-3">
-            <Label>Selecciona tu plan</Label>
+            <Label>{auth.selectPlan}</Label>
             <div className="grid gap-3">
               {plans.map((plan) => {
                 const features = plan.features as unknown as PlanFeatures;
@@ -112,17 +114,17 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{plan.name}</span>
                         <span className="text-sm font-semibold">
-                          {formatCLP(plan.price_monthly)}/mes
+                          {formatCLP(plan.price_monthly)}{common.perMonth}
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {features.locations === -1
-                          ? "Ubicaciones ilimitadas"
-                          : `${features.locations} ${features.locations === 1 ? "ubicación" : "ubicaciones"}`}
+                          ? auth.unlimitedLocations
+                          : `${features.locations} ${features.locations === 1 ? auth.locationSingular : auth.locationPlural}`}
                         {" · "}
                         {features.resources_per_location === -1
-                          ? "Recursos ilimitados"
-                          : `${features.resources_per_location} recursos/ubicación`}
+                          ? auth.unlimitedResources
+                          : `${features.resources_per_location} ${auth.resourcesPerLocation}`}
                         {features.add_ons && " · Add-ons"}
                         {features.analytics && " · Analytics"}
                       </p>
@@ -138,11 +140,11 @@ export function OnboardingForm({ plans }: { plans: Plan[] }) {
           )}
 
           <Button type="submit" className="w-full" disabled={isPending || !name.trim()}>
-            {isPending ? "Creando..." : "Continuar"}
+            {isPending ? common.creating : auth.continue}
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Paso 1 de 3
+            {auth.step1of3}
           </p>
         </form>
       </CardContent>

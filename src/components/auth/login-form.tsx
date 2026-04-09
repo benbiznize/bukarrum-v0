@@ -16,9 +16,11 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function LoginForm() {
   const router = useRouter();
+  const { auth, common } = useDict();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export function LoginForm() {
     });
 
     if (error) {
-      setError("Correo o contraseña incorrectos");
+      setError(auth.errorInvalidCredentials);
       setLoading(false);
       return;
     }
@@ -71,7 +73,7 @@ export function LoginForm() {
     setOtpLoading(false);
 
     if (error && error.status !== 422) {
-      setOtpError("Algo salió mal. Intenta nuevamente.");
+      setOtpError(auth.errorGeneric);
       return;
     }
 
@@ -94,7 +96,7 @@ export function LoginForm() {
     setOtpLoading(false);
 
     if (error) {
-      setOtpError("Código incorrecto o expirado. Intenta nuevamente.");
+      setOtpError(auth.otpInvalid);
       return;
     }
 
@@ -119,7 +121,7 @@ export function LoginForm() {
     setOtpLoading(false);
 
     if (error) {
-      setOtpError("Algo salió mal. Intenta nuevamente.");
+      setOtpError(auth.errorGeneric);
       return;
     }
 
@@ -139,27 +141,25 @@ export function LoginForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-        <CardDescription>
-          Accede a tu panel de administración
-        </CardDescription>
+        <CardTitle className="text-2xl">{auth.loginTitle}</CardTitle>
+        <CardDescription>{auth.loginSubtitle}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
           <Tabs defaultValue={0}>
             <TabsList className="w-full">
-              <TabsTrigger value={0}>Contraseña</TabsTrigger>
-              <TabsTrigger value={1}>Enlace mágico</TabsTrigger>
+              <TabsTrigger value={0}>{auth.tabPassword}</TabsTrigger>
+              <TabsTrigger value={1}>{auth.tabMagicLink}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={0}>
               <form onSubmit={handleEmailLogin} className="grid gap-4 pt-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Correo electrónico</Label>
+                  <Label htmlFor="email">{auth.email}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="tu@correo.com"
+                    placeholder={auth.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -167,12 +167,12 @@ export function LoginForm() {
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Contraseña</Label>
+                    <Label htmlFor="password">{auth.password}</Label>
                     <Link
                       href="/forgot-password"
                       className="text-xs text-muted-foreground underline-offset-4 hover:underline"
                     >
-                      ¿Olvidaste tu contraseña?
+                      {auth.forgotPassword}
                     </Link>
                   </div>
                   <Input
@@ -189,7 +189,7 @@ export function LoginForm() {
                 )}
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Cargando..." : "Iniciar sesión"}
+                  {loading ? common.loading : auth.signIn}
                 </Button>
               </form>
             </TabsContent>
@@ -198,11 +198,11 @@ export function LoginForm() {
               {!otpSent ? (
                 <form onSubmit={handleSendOtp} className="grid gap-4 pt-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="otp-email">Correo electrónico</Label>
+                    <Label htmlFor="otp-email">{auth.email}</Label>
                     <Input
                       id="otp-email"
                       type="email"
-                      placeholder="tu@correo.com"
+                      placeholder={auth.emailPlaceholder}
                       value={otpEmail}
                       onChange={(e) => setOtpEmail(e.target.value)}
                       required
@@ -214,21 +214,21 @@ export function LoginForm() {
                   )}
 
                   <Button type="submit" className="w-full" disabled={otpLoading}>
-                    {otpLoading ? "Enviando..." : "Enviar código"}
+                    {otpLoading ? common.sending : auth.sendMagicLink}
                   </Button>
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} className="grid gap-4 pt-4">
                   <p className="text-sm text-muted-foreground">
-                    Revisa tu correo. Puedes ingresar el código de 6 dígitos o hacer clic en el enlace.
+                    {auth.otpSent}
                   </p>
                   <div className="grid gap-2">
-                    <Label htmlFor="otp-code">Código de verificación</Label>
+                    <Label htmlFor="otp-code">{auth.verificationCode}</Label>
                     <Input
                       id="otp-code"
                       type="text"
                       inputMode="numeric"
-                      placeholder="123456"
+                      placeholder={auth.otpPlaceholder}
                       maxLength={6}
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
@@ -241,11 +241,11 @@ export function LoginForm() {
                   )}
 
                   {otpResent && (
-                    <p className="text-sm text-green-600">Código reenviado</p>
+                    <p className="text-sm text-green-600">{auth.codeSent}</p>
                   )}
 
                   <Button type="submit" className="w-full" disabled={otpLoading}>
-                    {otpLoading ? "Verificando..." : "Verificar código"}
+                    {otpLoading ? common.verifying : auth.verifyOtp}
                   </Button>
 
                   <button
@@ -254,7 +254,7 @@ export function LoginForm() {
                     disabled={otpLoading}
                     className="text-sm text-muted-foreground underline-offset-4 hover:underline disabled:opacity-50"
                   >
-                    Reenviar código
+                    {auth.resendCode}
                   </button>
                 </form>
               )}
@@ -263,7 +263,7 @@ export function LoginForm() {
 
           <div className="flex items-center gap-4">
             <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground uppercase">o</span>
+            <span className="text-xs text-muted-foreground uppercase">{common.or}</span>
             <Separator className="flex-1" />
           </div>
 
@@ -274,13 +274,13 @@ export function LoginForm() {
             type="button"
           >
             <GoogleIcon />
-            Continuar con Google
+            {auth.signInWithGoogle}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            ¿No tienes cuenta?{" "}
+            {auth.noAccount}{" "}
             <Link href="/signup" className="text-primary underline-offset-4 hover:underline">
-              Crear cuenta
+              {auth.signUp}
             </Link>
           </p>
         </div>

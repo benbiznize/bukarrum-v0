@@ -20,8 +20,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { createFirstResource } from "@/app/(auth)/onboarding/resource/actions";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function OnboardingResourceForm() {
+  const { auth, common } = useDict();
   const [state, formAction, isPending] = useActionState(
     async (_prev: { error: string }, formData: FormData) => {
       const result = await createFirstResource(formData);
@@ -33,55 +35,55 @@ export function OnboardingResourceForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Agrega tu primer recurso</CardTitle>
+        <CardTitle className="text-2xl">{auth.onboardingResourceTitle}</CardTitle>
         <CardDescription>
-          ¿Qué pueden reservar tus clientes?
+          {auth.onboardingResourceSubtitle}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre del recurso</Label>
+            <Label htmlFor="name">{auth.resourceName}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Sala de Ensayo DJ"
+              placeholder={auth.resourceNamePlaceholder}
               required
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">{common.description}</Label>
             <Textarea
               id="description"
               name="description"
-              placeholder="Equipamiento, dimensiones, detalles..."
+              placeholder={auth.descriptionPlaceholder}
               rows={3}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="type">Tipo</Label>
+            <Label htmlFor="type">{auth.type}</Label>
             <Select name="type" defaultValue="room">
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="room" label="Sala">Sala</SelectItem>
-                <SelectItem value="equipment" label="Equipamiento">Equipamiento</SelectItem>
+                <SelectItem value="room" label={common.room}>{common.room}</SelectItem>
+                <SelectItem value="equipment" label={common.equipment}>{common.equipment}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="hourly_rate">Tarifa por hora (CLP)</Label>
+            <Label htmlFor="hourly_rate">{common.hourlyRateCLP}</Label>
             <Input
               id="hourly_rate"
               name="hourly_rate"
               type="number"
               min="0"
               step="1000"
-              placeholder="15000"
+              placeholder={auth.ratePlaceholder}
               required
             />
           </div>
@@ -91,11 +93,11 @@ export function OnboardingResourceForm() {
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending ? "Creando..." : "Finalizar configuración"}
+            {isPending ? common.creating : auth.finishSetup}
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Paso 3 de 3
+            {auth.step3of3}
           </p>
         </form>
       </CardContent>

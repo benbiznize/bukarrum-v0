@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Box, CalendarDays, DollarSign } from "lucide-react";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Resumen" };
 
@@ -66,28 +67,31 @@ export default async function TenantDashboardPage({
       minimumFractionDigits: 0,
     }).format(amount);
 
+  const dict = await getDictionary("es");
+  const d = dict.dashboard;
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Resumen</h1>
+      <h1 className="text-2xl font-bold mb-6">{d.overview}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Ubicaciones"
+          title={d.locations}
           value={String(locationsRes.count ?? 0)}
           icon={MapPin}
         />
         <StatCard
-          title="Recursos"
+          title={d.resources}
           value={String(resourcesRes.count ?? 0)}
           icon={Box}
         />
         <StatCard
-          title="Reservas activas"
+          title={d.activeBookings}
           value={String(bookingsRes.count ?? 0)}
           icon={CalendarDays}
         />
         <StatCard
-          title="Ingresos confirmados"
+          title={d.confirmedRevenue}
           value={formatCLP(totalRevenue)}
           icon={DollarSign}
         />

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getResourcesForLocation } from "@/app/(booking)/[tenantSlug]/actions";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type Resource = {
   id: string;
@@ -38,6 +39,7 @@ export function StepResource({
     maxDuration: number;
   }>;
 }) {
+  const { booking, common } = useDict();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,12 +61,12 @@ export function StepResource({
   }
 
   if (resources.length === 0) {
-    return <p className="text-muted-foreground text-center py-8">No hay recursos disponibles en este local</p>;
+    return <p className="text-muted-foreground text-center py-8">{booking.noResources}</p>;
   }
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Selecciona un recurso</h2>
+      <h2 className="text-lg font-semibold mb-4">{booking.selectResource}</h2>
       <div className="grid gap-3">
         {resources.map((res) => (
           <Card
@@ -103,11 +105,11 @@ export function StepResource({
                     )}
                   </div>
                   <Badge variant="secondary" className="ml-2 shrink-0">
-                    {res.type === "room" ? "Sala" : "Equipo"}
+                    {res.type === "room" ? common.room : common.equipment}
                   </Badge>
                 </div>
                 <p className="text-sm font-medium text-primary mt-2">
-                  {fmt.format(res.hourly_rate)} / hora
+                  {fmt.format(res.hourly_rate)} {common.perHour}
                 </p>
               </div>
             </CardContent>

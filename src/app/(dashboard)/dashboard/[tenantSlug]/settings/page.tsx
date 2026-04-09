@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Configuración" };
 import { Badge } from "@/components/ui/badge";
@@ -56,12 +57,9 @@ export default async function SettingsPage({
       minimumFractionDigits: 0,
     }).format(amount);
 
-  const statusLabels: Record<string, string> = {
-    active: "Activa",
-    trialing: "Prueba gratuita",
-    past_due: "Pago pendiente",
-    cancelled: "Cancelada",
-  };
+  const dict = await getDictionary("es");
+  const d = dict.dashboard;
+  const statusLabels = d.subscriptionStatusLabels as Record<string, string>;
 
   const hasMpSubscription = !!subscription?.mercadopago_subscription_id;
   const trialEnd = subscription?.current_period_end
@@ -72,24 +70,24 @@ export default async function SettingsPage({
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Configuración</h1>
+      <h1 className="text-2xl font-bold mb-6">{d.settings}</h1>
 
       <div className="grid gap-6 max-w-lg">
         <Card>
           <CardHeader>
-            <CardTitle>Negocio</CardTitle>
+            <CardTitle>{d.business}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Nombre</span>
+              <span className="text-muted-foreground">{dict.common.name}</span>
               <span>{tenant.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">URL pública</span>
+              <span className="text-muted-foreground">{d.publicUrl}</span>
               <span>bukarrum.com/{tenant.slug}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Correo</span>
+              <span className="text-muted-foreground">{d.emailLabel}</span>
               <span>{user.email}</span>
             </div>
           </CardContent>
@@ -97,22 +95,22 @@ export default async function SettingsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Suscripción</CardTitle>
+            <CardTitle>{d.subscription}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm">
             {plan ? (
               <>
                 <div className="grid gap-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Plan</span>
+                    <span className="text-muted-foreground">{d.plan}</span>
                     <span className="font-medium">{plan.name}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Precio</span>
-                    <span>{formatCLP(plan.price_monthly)}/mes</span>
+                    <span className="text-muted-foreground">{d.price}</span>
+                    <span>{formatCLP(plan.price_monthly)}{dict.common.perMonth}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Estado</span>
+                    <span className="text-muted-foreground">{dict.common.status}</span>
                     <Badge
                       variant={
                         subscription?.status === "active"
@@ -127,7 +125,7 @@ export default async function SettingsPage({
                   {isTrialing && trialEnd && (
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">
-                        Prueba hasta
+                        {d.trialUntil}
                       </span>
                       <span>
                         {trialEnd.toLocaleDateString("es-CL", {
@@ -140,9 +138,9 @@ export default async function SettingsPage({
                   )}
                   {hasMpSubscription && (
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Pago</span>
+                      <span className="text-muted-foreground">{d.payment}</span>
                       <span className="text-green-500 text-xs font-medium">
-                        MercadoPago activo
+                        {d.mercadoPagoActive}
                       </span>
                     </div>
                   )}
@@ -159,7 +157,7 @@ export default async function SettingsPage({
                 />
               </>
             ) : (
-              <p className="text-muted-foreground">Sin suscripción activa</p>
+              <p className="text-muted-foreground">{d.noActiveSubscription}</p>
             )}
           </CardContent>
         </Card>

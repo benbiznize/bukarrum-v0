@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "./image-upload";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type ResourceData = {
   id?: string;
@@ -40,6 +41,7 @@ export function ResourceForm({
     formData: FormData
   ) => Promise<{ error: string }>;
 }) {
+  const { dashboard, common } = useDict();
   const isEditing = !!resource;
   const [state, formAction, isPending] = useActionState(action, { error: "" });
   const [imageUrl, setImageUrl] = useState<string | null>(resource?.image_url ?? null);
@@ -47,12 +49,12 @@ export function ResourceForm({
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle>{isEditing ? "Editar recurso" : "Nuevo recurso"}</CardTitle>
+        <CardTitle>{isEditing ? dashboard.editResource : dashboard.createResource}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
           <div className="grid gap-2">
-            <Label>Imagen</Label>
+            <Label>{common.image}</Label>
             <ImageUpload
               tenantId={tenantId}
               value={imageUrl}
@@ -63,22 +65,22 @@ export function ResourceForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre</Label>
+            <Label htmlFor="name">{common.name}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Sala de Ensayo DJ"
+              placeholder={dashboard.resourceNamePlaceholder}
               defaultValue={resource?.name ?? ""}
               required
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">{common.description}</Label>
             <Textarea
               id="description"
               name="description"
-              placeholder="Equipamiento, dimensiones, detalles..."
+              placeholder={dashboard.descriptionPlaceholder}
               defaultValue={resource?.description ?? ""}
               rows={3}
             />
@@ -91,21 +93,21 @@ export function ResourceForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="room" label="Sala">Sala</SelectItem>
-                <SelectItem value="equipment" label="Equipamiento">Equipamiento</SelectItem>
+                <SelectItem value="room" label={common.room}>{common.room}</SelectItem>
+                <SelectItem value="equipment" label={common.equipment}>{common.equipment}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="hourly_rate">Tarifa por hora (CLP)</Label>
+            <Label htmlFor="hourly_rate">{common.hourlyRateCLP}</Label>
             <Input
               id="hourly_rate"
               name="hourly_rate"
               type="number"
               min="0"
               step="1000"
-              placeholder="15000"
+              placeholder={dashboard.ratePlaceholder}
               defaultValue={resource?.hourly_rate ?? ""}
               required
             />
@@ -113,7 +115,7 @@ export function ResourceForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="min_duration_hours">Duración mínima (h)</Label>
+              <Label htmlFor="min_duration_hours">{dashboard.minDuration}</Label>
               <Input
                 id="min_duration_hours"
                 name="min_duration_hours"
@@ -124,7 +126,7 @@ export function ResourceForm({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="max_duration_hours">Duración máxima (h)</Label>
+              <Label htmlFor="max_duration_hours">{dashboard.maxDuration}</Label>
               <Input
                 id="max_duration_hours"
                 name="max_duration_hours"
@@ -143,7 +145,7 @@ export function ResourceForm({
                 name="is_active"
                 defaultChecked={resource?.is_active ?? true}
               />
-              <Label htmlFor="is_active">Recurso activo</Label>
+              <Label htmlFor="is_active">{dashboard.resourceActive}</Label>
             </div>
           )}
 
@@ -153,10 +155,10 @@ export function ResourceForm({
 
           <Button type="submit" disabled={isPending}>
             {isPending
-              ? "Guardando..."
+              ? common.saving
               : isEditing
-                ? "Guardar cambios"
-                : "Crear recurso"}
+                ? dashboard.saveChanges
+                : dashboard.createResource}
           </Button>
         </form>
       </CardContent>

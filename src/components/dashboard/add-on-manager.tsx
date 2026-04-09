@@ -27,6 +27,7 @@ import {
   updateAddOn,
   deleteAddOn,
 } from "@/app/(dashboard)/dashboard/[tenantSlug]/[locationSlug]/add-ons/actions";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type AddOn = {
   id: string;
@@ -55,6 +56,7 @@ export function AddOnManager({
   locationId: string;
   enabled: boolean;
 }) {
+  const { dashboard, common } = useDict();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<AddOn | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function AddOnManager({
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("¿Eliminar este servicio adicional?")) return;
+    if (!confirm(dashboard.addOns.deleteConfirm)) return;
     await deleteAddOn(tenantSlug, locationSlug, id);
   }
 
@@ -100,7 +102,7 @@ export function AddOnManager({
     return (
       <div className="rounded-md border border-dashed py-8 text-center">
         <p className="text-muted-foreground text-sm">
-          Los servicios adicionales están disponibles en el plan Pro o superior.
+          {dashboard.addOns.proRequired}
         </p>
       </div>
     );
@@ -109,41 +111,41 @@ export function AddOnManager({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Servicios adicionales</h2>
+        <h2 className="text-lg font-semibold">{dashboard.addOns.title}</h2>
         <Dialog open={open} onOpenChange={setOpen}>
           <Button size="sm" onClick={openCreate}>
             <Plus className="h-4 w-4 mr-1" />
-            Agregar
+            {dashboard.addOns.add}
           </Button>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editing ? "Editar servicio" : "Nuevo servicio adicional"}
+                {editing ? dashboard.addOns.editService : dashboard.addOns.newService}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="addon-name">Nombre</Label>
+                <Label htmlFor="addon-name">{common.name}</Label>
                 <Input
                   id="addon-name"
                   name="name"
-                  placeholder="Ej: Ingeniero de Sonido"
+                  placeholder={dashboard.addOnNamePlaceholder}
                   defaultValue={editing?.name ?? ""}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="addon-desc">Descripción</Label>
+                <Label htmlFor="addon-desc">{common.description}</Label>
                 <Textarea
                   id="addon-desc"
                   name="description"
-                  placeholder="Detalles del servicio..."
+                  placeholder={dashboard.addOnDescPlaceholder}
                   defaultValue={editing?.description ?? ""}
                   rows={2}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="addon-rate">Tarifa por hora (CLP)</Label>
+                <Label htmlFor="addon-rate">{dashboard.addOns.rateCLP}</Label>
                 <Input
                   id="addon-rate"
                   name="hourly_rate"
@@ -161,12 +163,12 @@ export function AddOnManager({
                     name="is_active"
                     defaultChecked={editing.is_active}
                   />
-                  <Label htmlFor="addon-active">Activo</Label>
+                  <Label htmlFor="addon-active">{common.active}</Label>
                 </div>
               )}
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={loading}>
-                {loading ? "Guardando..." : editing ? "Guardar" : "Crear"}
+                {loading ? common.saving : editing ? common.save : common.creating}
               </Button>
             </form>
           </DialogContent>
@@ -178,9 +180,9 @@ export function AddOnManager({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Tarifa/hora</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>{common.name}</TableHead>
+                <TableHead>{dashboard.addOns.ratePerHour}</TableHead>
+                <TableHead>{common.status}</TableHead>
                 <TableHead className="w-[80px]" />
               </TableRow>
             </TableHeader>
@@ -200,7 +202,7 @@ export function AddOnManager({
                   <TableCell>{fmt.format(a.hourly_rate)}</TableCell>
                   <TableCell>
                     <Badge variant={a.is_active ? "default" : "secondary"}>
-                      {a.is_active ? "Activo" : "Inactivo"}
+                      {a.is_active ? common.active : common.inactive}
                     </Badge>
                   </TableCell>
                   <TableCell className="flex gap-1">
@@ -229,7 +231,7 @@ export function AddOnManager({
       ) : (
         <div className="rounded-md border border-dashed py-8 text-center">
           <p className="text-muted-foreground text-sm">
-            Agrega servicios como ingenieros de sonido, fotógrafos, etc.
+            {dashboard.addOns.emptyHint}
           </p>
         </div>
       )}

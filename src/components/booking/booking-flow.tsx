@@ -3,6 +3,7 @@
 import { useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useDict } from "@/lib/i18n/dict-context";
 import { StepLocation } from "./step-location";
 import { StepResource } from "./step-resource";
 import { StepDate } from "./step-date";
@@ -45,7 +46,6 @@ type Action =
   | { type: "BOOKING_COMPLETE" };
 
 const STEP_ORDER: Step[] = ["location", "resource", "date", "time", "duration", "addons", "contact", "confirmation"];
-const STEP_LABELS = ["Local", "Recurso", "Fecha", "Hora", "Duración", "Extras", "Confirmar"];
 
 function reducer(state: BookingState, action: Action): BookingState {
   switch (action.type) {
@@ -136,6 +136,7 @@ export function BookingFlow({
   tenantName: string;
   locations: Location[];
 }) {
+  const { booking } = useDict();
   const skipLocation = locations.length === 1;
   const initialStep: Step = skipLocation ? "resource" : "location";
   const initialLocation = skipLocation ? locations[0] : null;
@@ -165,12 +166,11 @@ export function BookingFlow({
   return (
     <div className="w-full max-w-lg mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-center mb-1">{tenantName}</h1>
-      <p className="text-muted-foreground text-center text-sm mb-6">Reserva tu espacio</p>
+      <p className="text-muted-foreground text-center text-sm mb-6">{booking.bookYourSpace}</p>
 
       {state.step !== "confirmation" && (
         <div className="flex items-center gap-1 mb-6">
-          {STEP_LABELS.map((label, i) => {
-            const adjustedIdx = skipLocation ? stepIdx + 1 : stepIdx;
+          {booking.stepLabels.map((label, i) => {
             const isActive = i === (skipLocation ? stepIdx + 1 : stepIdx);
             const isDone = i < (skipLocation ? stepIdx + 1 : stepIdx);
             return (
@@ -194,7 +194,7 @@ export function BookingFlow({
           onClick={() => dispatch({ type: "GO_BACK" })}
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Volver
+          {booking.back}
         </Button>
       )}
 

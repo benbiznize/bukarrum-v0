@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type Location = {
   id: string;
@@ -20,9 +21,10 @@ export function StepLocation({
   locations: Location[];
   dispatch: React.Dispatch<{ type: "SELECT_LOCATION"; locationId: string; locationName: string; locationTimezone: string }>;
 }) {
+  const { booking } = useDict();
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Selecciona un local</h2>
+      <h2 className="text-lg font-semibold mb-4">{booking.selectLocation}</h2>
       <div className="grid gap-3">
         {locations.map((loc) => (
           <Card

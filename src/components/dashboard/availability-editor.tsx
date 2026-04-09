@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type DayOfWeek =
   | "monday"
@@ -21,16 +22,6 @@ type AvailabilitySlot = {
   day_of_week: DayOfWeek;
   start_time: string;
   end_time: string;
-};
-
-const DAY_LABELS: Record<DayOfWeek, string> = {
-  monday: "Lunes",
-  tuesday: "Martes",
-  wednesday: "Miércoles",
-  thursday: "Jueves",
-  friday: "Viernes",
-  saturday: "Sábado",
-  sunday: "Domingo",
 };
 
 const DAYS: DayOfWeek[] = [
@@ -60,6 +51,7 @@ export function AvailabilityEditor({
     formData: FormData
   ) => Promise<{ error: string; success?: boolean }>;
 }) {
+  const { dashboard, common } = useDict();
   const slotsByDay = new Map<DayOfWeek, AvailabilitySlot>();
   for (const slot of availability) {
     slotsByDay.set(slot.day_of_week, slot);
@@ -71,7 +63,7 @@ export function AvailabilityEditor({
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle>Horario semanal</CardTitle>
+        <CardTitle>{dashboard.weeklySchedule}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
@@ -89,7 +81,7 @@ export function AvailabilityEditor({
                     }
                   />
                   <Label htmlFor={`enabled_${day}`} className="text-sm">
-                    {DAY_LABELS[day]}
+                    {dashboard.dayLabels[day]}
                   </Label>
                 </div>
                 <Input
@@ -98,7 +90,7 @@ export function AvailabilityEditor({
                   defaultValue={slot?.start_time?.slice(0, 5) ?? "09:00"}
                   className="w-28"
                 />
-                <span className="text-muted-foreground text-sm">a</span>
+                <span className="text-muted-foreground text-sm">{dashboard.to}</span>
                 <Input
                   type="time"
                   name={`end_${day}`}
@@ -114,11 +106,11 @@ export function AvailabilityEditor({
           )}
 
           {state.success && !state.error && (
-            <p className="text-sm text-green-600">Horario guardado correctamente</p>
+            <p className="text-sm text-green-600">{dashboard.scheduleSaved}</p>
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending ? "Guardando..." : "Guardar horario"}
+            {isPending ? common.saving : dashboard.saveSchedule}
           </Button>
         </form>
       </CardContent>

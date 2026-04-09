@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createBooking } from "@/app/(booking)/[tenantSlug]/actions";
 import type { BookingState } from "./booking-flow";
+import { useDict } from "@/lib/i18n/dict-context";
 
 const fmt = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -26,6 +27,7 @@ export function StepContact({
     | { type: "GO_BACK" }
   >;
 }) {
+  const { booking } = useDict();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +55,7 @@ export function StepContact({
 
     if (result.error) {
       if (result.error === "BOOKING_CONFLICT") {
-        setError("Este horario ya no está disponible. Elige otro.");
+        setError(booking.unavailableSlot);
       } else {
         setError(result.error);
       }
@@ -74,35 +76,35 @@ export function StepContact({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Confirmar reserva</h2>
+      <h2 className="text-lg font-semibold mb-4">{booking.confirmBooking}</h2>
 
       <Card className="mb-6">
         <CardContent className="p-4 space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Local</span>
+            <span className="text-muted-foreground">{booking.location}</span>
             <span className="font-medium">{state.locationName}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Recurso</span>
+            <span className="text-muted-foreground">{booking.resource}</span>
             <span className="font-medium">{state.resourceName}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Fecha</span>
+            <span className="text-muted-foreground">{booking.date}</span>
             <span className="font-medium capitalize">{dateDisplay}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Hora</span>
+            <span className="text-muted-foreground">{booking.time}</span>
             <span className="font-medium">{state.startTime}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Duración</span>
+            <span className="text-muted-foreground">{booking.duration}</span>
             <span className="font-medium">
-              {state.durationHours} {state.durationHours === 1 ? "hora" : "horas"}
+              {state.durationHours} {state.durationHours === 1 ? booking.hour : booking.hours}
             </span>
           </div>
           <Separator />
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Recurso</span>
+            <span className="text-muted-foreground">{booking.resource}</span>
             <span className="font-medium">{fmt.format(resourcePrice)}</span>
           </div>
           {state.selectedAddOns.map((a) => (
@@ -113,7 +115,7 @@ export function StepContact({
           ))}
           <Separator />
           <div className="flex justify-between font-semibold text-base">
-            <span>Total</span>
+            <span>{booking.total}</span>
             <span className="text-primary">{fmt.format(totalPrice)}</span>
           </div>
         </CardContent>
@@ -121,31 +123,31 @@ export function StepContact({
 
       <form onSubmit={handleSubmit} className="grid gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="name">Nombre</Label>
+          <Label htmlFor="name">{booking.name}</Label>
           <Input
             id="name"
             name="name"
-            placeholder="Tu nombre completo"
+            placeholder={booking.namePlaceholder}
             required
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="email">Correo electrónico</Label>
+          <Label htmlFor="email">{booking.email}</Label>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="tu@correo.com"
+            placeholder={booking.emailPlaceholder}
             required
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="phone">Teléfono (opcional)</Label>
+          <Label htmlFor="phone">{booking.phone}</Label>
           <Input
             id="phone"
             name="phone"
             type="tel"
-            placeholder="+56 9 1234 5678"
+            placeholder={booking.phonePlaceholder}
           />
         </div>
 
@@ -154,7 +156,7 @@ export function StepContact({
         )}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Reservando..." : "Confirmar reserva"}
+          {loading ? booking.booking : booking.confirmBooking}
         </Button>
       </form>
     </div>

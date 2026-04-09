@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "./image-upload";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type LocationData = {
   id?: string;
@@ -31,6 +32,7 @@ export function LocationForm({
     formData: FormData
   ) => Promise<{ error: string }>;
 }) {
+  const { dashboard, common } = useDict();
   const isEditing = !!location;
   const [state, formAction, isPending] = useActionState(action, { error: "" });
   const [imageUrl, setImageUrl] = useState<string | null>(location?.image_url ?? null);
@@ -38,12 +40,12 @@ export function LocationForm({
   return (
     <Card className="max-w-lg">
       <CardHeader>
-        <CardTitle>{isEditing ? "Editar ubicación" : "Nueva ubicación"}</CardTitle>
+        <CardTitle>{isEditing ? dashboard.editLocation : dashboard.createLocation}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
           <div className="grid gap-2">
-            <Label>Imagen</Label>
+            <Label>{common.image}</Label>
             <ImageUpload
               tenantId={tenantId}
               value={imageUrl}
@@ -54,49 +56,49 @@ export function LocationForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="name">Nombre</Label>
+            <Label htmlFor="name">{common.name}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Sede Providencia"
+              placeholder={dashboard.namePlaceholder}
               defaultValue={location?.name ?? ""}
               required
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="address">Dirección</Label>
+            <Label htmlFor="address">{common.address}</Label>
             <Input
               id="address"
               name="address"
-              placeholder="Ej: Av. Providencia 1234"
+              placeholder={dashboard.addressPlaceholder}
               defaultValue={location?.address ?? ""}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="city">Ciudad</Label>
+              <Label htmlFor="city">{common.city}</Label>
               <Input
                 id="city"
                 name="city"
-                placeholder="Santiago"
+                placeholder={dashboard.cityPlaceholder}
                 defaultValue={location?.city ?? ""}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">{common.phone}</Label>
               <Input
                 id="phone"
                 name="phone"
-                placeholder="+56 9 1234 5678"
+                placeholder={dashboard.phonePlaceholder}
                 defaultValue={location?.phone ?? ""}
               />
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="timezone">Zona horaria</Label>
+            <Label htmlFor="timezone">{dashboard.timezone}</Label>
             <Input
               id="timezone"
               name="timezone"
@@ -113,7 +115,7 @@ export function LocationForm({
                 name="is_active"
                 defaultChecked={location?.is_active ?? true}
               />
-              <Label htmlFor="is_active">Ubicación activa</Label>
+              <Label htmlFor="is_active">{dashboard.locationActive}</Label>
             </div>
           )}
 
@@ -123,10 +125,10 @@ export function LocationForm({
 
           <Button type="submit" disabled={isPending}>
             {isPending
-              ? "Guardando..."
+              ? common.saving
               : isEditing
-                ? "Guardar cambios"
-                : "Crear ubicación"}
+                ? dashboard.saveChanges
+                : dashboard.createLocation}
           </Button>
         </form>
       </CardContent>

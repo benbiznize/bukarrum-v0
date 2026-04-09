@@ -13,8 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useDict } from "@/lib/i18n/dict-context";
 
 export function ForgotPasswordForm() {
+  const { auth, common } = useDict();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -32,14 +34,14 @@ export function ForgotPasswordForm() {
       });
 
       if (error) {
-        setError("Algo salió mal. Intenta nuevamente.");
+        setError(auth.errorGeneric);
         setLoading(false);
         return;
       }
 
       setSuccess(true);
     } catch {
-      setError("No se pudo conectar. Intenta nuevamente.");
+      setError(auth.errorConnection);
     } finally {
       setLoading(false);
     }
@@ -49,9 +51,9 @@ export function ForgotPasswordForm() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Revisa tu correo</CardTitle>
+          <CardTitle className="text-2xl">{auth.checkEmailTitle}</CardTitle>
           <CardDescription>
-            Te enviamos un enlace para restablecer tu contraseña a{" "}
+            {auth.checkEmailMessage}{" "}
             <strong>{email}</strong>.
           </CardDescription>
         </CardHeader>
@@ -61,7 +63,7 @@ export function ForgotPasswordForm() {
               href="/login"
               className="text-primary underline-offset-4 hover:underline"
             >
-              Volver a iniciar sesión
+              {auth.backToLogin}
             </Link>
           </p>
         </CardContent>
@@ -72,19 +74,19 @@ export function ForgotPasswordForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Recuperar contraseña</CardTitle>
+        <CardTitle className="text-2xl">{auth.forgotPasswordTitle}</CardTitle>
         <CardDescription>
-          Ingresa tu correo y te enviaremos un enlace para restablecerla
+          {auth.forgotPasswordSubtitle}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="email">{auth.email}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="tu@correo.com"
+              placeholder={auth.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -94,7 +96,7 @@ export function ForgotPasswordForm() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Enviando..." : "Enviar enlace"}
+            {loading ? common.sending : auth.sendLink}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
@@ -102,7 +104,7 @@ export function ForgotPasswordForm() {
               href="/login"
               className="text-primary underline-offset-4 hover:underline"
             >
-              Volver a iniciar sesión
+              {auth.backToLogin}
             </Link>
           </p>
         </form>

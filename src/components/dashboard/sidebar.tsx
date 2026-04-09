@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { cn } from "@/lib/utils";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type Location = {
   id: string;
@@ -35,6 +36,7 @@ export function DashboardSidebar({
   locations: Location[];
   tenantSlug: string;
 }) {
+  const { dashboard, common } = useDict();
   const pathname = usePathname();
   const base = `/dashboard/${tenantSlug}`;
 
@@ -54,19 +56,19 @@ export function DashboardSidebar({
           <SidebarLink
             href={base}
             icon={LayoutDashboard}
-            label="Resumen"
+            label={dashboard.overview}
             active={pathname === base}
           />
           <SidebarLink
             href={`${base}/bookings`}
             icon={CalendarDays}
-            label="Reservas"
+            label={dashboard.bookings}
             active={pathname.startsWith(`${base}/bookings`)}
           />
           <SidebarLink
             href={`${base}/locations`}
             icon={Box}
-            label="Recursos"
+            label={dashboard.resources}
             active={pathname.startsWith(`${base}/locations`)}
           />
         </div>
@@ -75,7 +77,7 @@ export function DashboardSidebar({
         <div className="mt-6">
           <div className="flex items-center justify-between px-3 mb-2">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Ubicaciones
+              {dashboard.locations}
             </span>
             <Link
               href={`${base}/locations/new`}
@@ -92,12 +94,12 @@ export function DashboardSidebar({
                 icon={MapPin}
                 label={location.name}
                 active={pathname.startsWith(`${base}/${location.slug}`)}
-                badge={!location.is_active ? "Inactivo" : undefined}
+                badge={!location.is_active ? common.inactive : undefined}
               />
             ))}
             {locations.length === 0 && (
               <p className="px-3 text-xs text-muted-foreground">
-                Sin ubicaciones aún
+                {dashboard.noLocationsYet}
               </p>
             )}
           </div>
@@ -109,7 +111,7 @@ export function DashboardSidebar({
             <SidebarLink
               href={`${base}/settings`}
               icon={Settings}
-              label="Configuración"
+              label={dashboard.settings}
               active={pathname.startsWith(`${base}/settings`)}
             />
           </div>

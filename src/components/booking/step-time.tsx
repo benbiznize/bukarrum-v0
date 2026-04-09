@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTimeSlots } from "@/app/(booking)/[tenantSlug]/actions";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type TimeSlot = {
   startTime: string;
@@ -21,6 +22,7 @@ export function StepTime({
   timezone: string;
   dispatch: React.Dispatch<{ type: "SELECT_TIME"; startTime: string; availableUntil: string }>;
 }) {
+  const { booking } = useDict();
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +44,7 @@ export function StepTime({
   }
 
   if (slots.length === 0) {
-    return <p className="text-muted-foreground text-center py-8">No hay horarios disponibles para esta fecha</p>;
+    return <p className="text-muted-foreground text-center py-8">{booking.noSlots}</p>;
   }
 
   // Format date for display
@@ -55,7 +57,7 @@ export function StepTime({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-1">Selecciona una hora</h2>
+      <h2 className="text-lg font-semibold mb-1">{booking.selectTime}</h2>
       <p className="text-sm text-muted-foreground mb-4 capitalize">{dateDisplay}</p>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
         {slots.map((slot) => (

@@ -7,6 +7,7 @@ import {
   changePlan,
 } from "@/app/(dashboard)/dashboard/[tenantSlug]/settings/actions";
 import { useRouter } from "next/navigation";
+import { useDict } from "@/lib/i18n/dict-context";
 
 interface SubscriptionActionsProps {
   tenantSlug: string;
@@ -21,6 +22,7 @@ export function SubscriptionActions({
   hasMpSubscription,
   plans,
 }: SubscriptionActionsProps) {
+  const { dashboard, common } = useDict();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -61,14 +63,14 @@ export function SubscriptionActions({
     <div className="grid gap-3">
       {!hasMpSubscription && (
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">Activar pago:</p>
+          <p className="text-sm text-muted-foreground">{dashboard.activatePayment}</p>
           <div className="flex gap-2">
             <Button
               size="sm"
               onClick={() => handleCheckout("monthly")}
               disabled={loading}
             >
-              {loading ? "Procesando..." : "Pago mensual"}
+              {loading ? common.processing : dashboard.monthlyPayment}
             </Button>
             <Button
               size="sm"
@@ -76,7 +78,7 @@ export function SubscriptionActions({
               onClick={() => handleCheckout("annual")}
               disabled={loading}
             >
-              {loading ? "Procesando..." : "Pago anual"}
+              {loading ? common.processing : dashboard.annualPayment}
             </Button>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function SubscriptionActions({
 
       {otherPlans.length > 0 && (
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">Cambiar plan:</p>
+          <p className="text-sm text-muted-foreground">{dashboard.changePlan}</p>
           <div className="flex gap-2">
             {otherPlans.map((plan) => (
               <Button

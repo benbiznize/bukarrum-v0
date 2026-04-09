@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Check } from "lucide-react";
 import { getAddOnsForLocation } from "@/app/(booking)/[tenantSlug]/actions";
 import type { BookingState } from "./booking-flow";
+import { useDict } from "@/lib/i18n/dict-context";
 
 type AddOn = {
   id: string;
@@ -31,6 +32,7 @@ export function StepAddOns({
     | { type: "GO_BACK" }
   >;
 }) {
+  const { booking } = useDict();
   const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -86,8 +88,8 @@ export function StepAddOns({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-1">Servicios adicionales</h2>
-      <p className="text-sm text-muted-foreground mb-4">Opcional — selecciona los que desees</p>
+      <h2 className="text-lg font-semibold mb-1">{booking.addOnsTitle}</h2>
+      <p className="text-sm text-muted-foreground mb-4">{booking.addOnsSubtitle}</p>
 
       <div className="grid gap-3 mb-6">
         {addOns.map((a) => {
@@ -132,7 +134,7 @@ export function StepAddOns({
       </div>
 
       <Button onClick={handleContinue} className="w-full">
-        {selected.size > 0 ? "Continuar con selección" : "Continuar sin adicionales"}
+        {selected.size > 0 ? booking.continueWithSelection : booking.continueWithout}
       </Button>
     </div>
   );

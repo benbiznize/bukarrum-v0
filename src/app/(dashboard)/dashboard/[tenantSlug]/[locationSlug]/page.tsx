@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Recursos" };
 import { buttonVariants } from "@/components/ui/button";
@@ -82,6 +83,10 @@ export default async function LocationDashboardPage({
 
   const base = `/dashboard/${tenantSlug}/${locationSlug}`;
 
+  const dict = await getDictionary("es");
+  const d = dict.dashboard;
+  const c = dict.common;
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -92,18 +97,18 @@ export default async function LocationDashboardPage({
           </p>
           {limitCheck.limit !== -1 && (
             <p className="text-sm text-muted-foreground">
-              {limitCheck.current} de {limitCheck.limit} recursos en tu plan {limitCheck.plan}
+              {d.resourcesInPlan.replace("{current}", String(limitCheck.current)).replace("{limit}", String(limitCheck.limit)).replace("{plan}", limitCheck.plan)}
             </p>
           )}
         </div>
         {atLimit ? (
           <span className="text-sm text-muted-foreground border rounded-md px-4 py-2">
-            Límite alcanzado
+            {c.limitReached}
           </span>
         ) : (
           <Link href={`${base}/resources/new`} className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />
-            Nuevo recurso
+            {d.newResource}
           </Link>
         )}
       </div>
@@ -113,11 +118,11 @@ export default async function LocationDashboardPage({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Tarifa/hora</TableHead>
-                <TableHead>Duración</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>{c.name}</TableHead>
+                <TableHead>{dict.auth.type}</TableHead>
+                <TableHead>{c.hourlyRateCLP}</TableHead>
+                <TableHead>{dict.booking.duration}</TableHead>
+                <TableHead>{c.status}</TableHead>
                 <TableHead className="w-[100px]" />
               </TableRow>
             </TableHeader>
@@ -129,7 +134,7 @@ export default async function LocationDashboardPage({
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">
-                      {resource.type === "room" ? "Sala" : "Equipamiento"}
+                      {resource.type === "room" ? c.room : c.equipment}
                     </Badge>
                   </TableCell>
                   <TableCell>{formatCLP(resource.hourly_rate)}</TableCell>
@@ -140,7 +145,7 @@ export default async function LocationDashboardPage({
                     <Badge
                       variant={resource.is_active ? "default" : "secondary"}
                     >
-                      {resource.is_active ? "Activo" : "Inactivo"}
+                      {resource.is_active ? c.active : c.inactive}
                     </Badge>
                   </TableCell>
                   <TableCell className="flex gap-1">
@@ -148,13 +153,13 @@ export default async function LocationDashboardPage({
                       href={`${base}/resources/${resource.id}/availability`}
                       className={buttonVariants({ variant: "ghost", size: "sm" })}
                     >
-                      Horario
+                      {d.schedule}
                     </Link>
                     <Link
                       href={`${base}/resources/${resource.id}/edit`}
                       className={buttonVariants({ variant: "ghost", size: "sm" })}
                     >
-                      Editar
+                      {c.edit}
                     </Link>
                   </TableCell>
                 </TableRow>
@@ -165,11 +170,11 @@ export default async function LocationDashboardPage({
       ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed py-12">
           <p className="text-muted-foreground mb-4">
-            Esta ubicación no tiene recursos aún
+            {d.noResourcesEmpty}
           </p>
           <Link href={`${base}/resources/new`} className={buttonVariants()}>
               <Plus className="mr-2 h-4 w-4" />
-              Crear primer recurso
+              {d.createFirstResource}
           </Link>
         </div>
       )}
