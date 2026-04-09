@@ -1,7 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import type { Database } from "@/lib/supabase/database.types";
+import {
+  sendBookingConfirmation,
+  sendNewBookingNotification,
+} from "@/lib/resend/emails";
 
 type DayOfWeek = Database["public"]["Enums"]["day_of_week"];
 
@@ -217,6 +222,55 @@ export async function createBooking(formData: FormData) {
       return { error: "BOOKING_CONFLICT" };
     }
     return { error: "Error al crear la reserva" };
+  }
+
+  // Send emails (fire-and-forget — don't block the response)
+  const { data: resourceData } = await supabase
+    .from("resources")
+    .select("name, tenant:tenants(name, user_id)")
+    .eq("id", resourceId)
+    .single();
+
+  const { data: locationData } = await supabase
+    .from("locations")
+    .select("name")
+    .eq("id", locationId)
+    .single();
+
+  if (resourceData?.tenant && locationData) {
+    const tenant = resourceData.tenant as unknown as {
+      name: string;
+      user_id: string;
+    };
+
+    // Get tenant owner email via service role (anon client can't access auth.admin)
+    const serviceClient = createServiceClient();
+    const { data: tenantUser } = await serviceClient.auth.admin
+      .getUserById(tenant.user_id)
+      .catch(() => ({ data: { user: null } }));
+
+    const dateDisplay = new Date(date + "T12:00:00").toLocaleDateString(
+      "es-CL",
+      { weekday: "long", day: "numeric", month: "long" }
+    );
+
+    const emailData = {
+      bookerName: name,
+      bookerEmail: email,
+      tenantName: tenant.name,
+      tenantEmail: tenantUser?.user?.email ?? "",
+      locationName: locationData.name,
+      resourceName: resourceData.name,
+      date: dateDisplay,
+      startTime,
+      durationHours,
+      totalPrice,
+    };
+
+    sendBookingConfirmation(emailData);
+    if (emailData.tenantEmail) {
+      sendNewBookingNotification(emailData);
+    }
   }
 
   return { error: "", bookingId };

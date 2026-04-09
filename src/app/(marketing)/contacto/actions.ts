@@ -1,6 +1,6 @@
 "use server";
 
-import { resend } from "@/lib/resend/client";
+import { getResend } from "@/lib/resend/client";
 
 export async function sendContactEmail(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
@@ -17,6 +17,8 @@ export async function sendContactEmail(formData: FormData) {
   }
 
   try {
+    const resend = getResend();
+    if (!resend) return { error: "Servicio de correo no configurado." };
     await resend.emails.send({
       from: "Bukarrum <noreply@bukarrum.com>",
       to: ["contacto@bukarrum.com"],
