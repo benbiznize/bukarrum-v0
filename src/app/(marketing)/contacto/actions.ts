@@ -3,6 +3,8 @@
 import { headers } from "next/headers";
 import { getResend } from "@/lib/resend/client";
 import { rateLimit } from "@/lib/rate-limit";
+import { emailLayout } from "@/lib/resend/templates/layout";
+import { contactFormContent } from "@/lib/resend/templates/contact-form";
 
 export async function sendContactEmail(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
@@ -27,12 +29,23 @@ export async function sendContactEmail(formData: FormData) {
   try {
     const resend = getResend();
     if (!resend) return { error: "Servicio de correo no configurado." };
+
+    const { bodyHtml, text } = contactFormContent({
+      name,
+      email,
+      business: business || "",
+      message,
+    });
+
     await resend.emails.send({
       from: "Bukarrum <noreply@bukarrum.com>",
       to: ["contacto@bukarrum.com"],
       replyTo: email,
       subject: `Contacto: ${business || name}`,
-      text: `Nombre: ${name}\nEmail: ${email}\nNegocio: ${business || "No especificado"}\n\nMensaje:\n${message}`,
+      html: emailLayout(bodyHtml, {
+        preheaderText: `Contacto: ${business || name}`,
+      }),
+      text,
     });
     return { success: true };
   } catch {

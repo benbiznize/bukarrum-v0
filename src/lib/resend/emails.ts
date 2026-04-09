@@ -1,13 +1,47 @@
 import { getResend } from "./client";
+import { emailLayout } from "./templates/layout";
+import { bookingConfirmationContent } from "./templates/booking-confirmation";
+import { newBookingNotificationContent } from "./templates/new-booking-notification";
+import { bookingStatusChangeContent } from "./templates/booking-status-change";
+import { formatCLP } from "./templates/components";
 
 const FROM = "Bukarrum <noreply@bukarrum.com>";
 
-const formatCLP = (amount: number) =>
-  new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    minimumFractionDigits: 0,
-  }).format(amount);
+function toICSDate(iso: string): string {
+  return new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+function generateICS(data: {
+  summary: string;
+  location: string;
+  description: string;
+  startISO: string;
+  endISO: string;
+  organizer: string;
+}): string {
+  const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@bukarrum.com`;
+  const now = toICSDate(new Date().toISOString());
+
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Bukarrum//Booking//ES",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${now}`,
+    `DTSTART:${toICSDate(data.startISO)}`,
+    `DTEND:${toICSDate(data.endISO)}`,
+    `SUMMARY:${data.summary}`,
+    `LOCATION:${data.location}`,
+    `DESCRIPTION:${data.description.replace(/\n/g, "\\n")}`,
+    `ORGANIZER;CN=${data.organizer}:MAILTO:noreply@bukarrum.com`,
+    "STATUS:CONFIRMED",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+}
 
 interface BookingEmailData {
   bookerName: string;
@@ -20,6 +54,8 @@ interface BookingEmailData {
   startTime: string;
   durationHours: number;
   totalPrice: number;
+  startISO: string;
+  endISO: string;
 }
 
 /**
@@ -30,27 +66,33 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
   try {
     const resend = getResend();
     if (!resend) return;
+
+    const { bodyHtml, text } = bookingConfirmationContent(data);
+
+    const icsContent = generateICS({
+      summary: `${data.resourceName} — ${data.tenantName}`,
+      location: data.locationName,
+      description: `Reserva en ${data.locationName}\\n${data.resourceName}\\n${data.date} ${data.startTime}`,
+      startISO: data.startISO,
+      endISO: data.endISO,
+      organizer: data.tenantName,
+    });
+
     await resend.emails.send({
       from: FROM,
       to: [data.bookerEmail],
       subject: `Reserva confirmada — ${data.resourceName}`,
-      text: [
-        `Hola ${data.bookerName},`,
-        "",
-        `Tu reserva ha sido creada exitosamente.`,
-        "",
-        `Detalles:`,
-        `  Local: ${data.locationName}`,
-        `  Recurso: ${data.resourceName}`,
-        `  Fecha: ${data.date}`,
-        `  Hora: ${data.startTime}`,
-        `  Duración: ${data.durationHours} ${data.durationHours === 1 ? "hora" : "horas"}`,
-        `  Total: ${formatCLP(data.totalPrice)}`,
-        "",
-        `El equipo de ${data.tenantName} se pondrá en contacto contigo para confirmar tu reserva.`,
-        "",
-        `— Bukarrum`,
-      ].join("\n"),
+      html: emailLayout(bodyHtml, {
+        preheaderText: `Reserva creada — ${data.resourceName} el ${data.date}`,
+      }),
+      text,
+      attachments: [
+        {
+          filename: "reserva.ics",
+          content: Buffer.from(icsContent).toString("base64"),
+          contentType: "text/calendar",
+        },
+      ],
     });
   } catch (err) {
     console.error("Failed to send booking confirmation email:", err);
@@ -64,26 +106,18 @@ export async function sendNewBookingNotification(data: BookingEmailData) {
   try {
     const resend = getResend();
     if (!resend) return;
+
+    const { bodyHtml, text } = newBookingNotificationContent(data);
+
     await resend.emails.send({
       from: FROM,
       to: [data.tenantEmail],
       replyTo: data.bookerEmail,
       subject: `Nueva reserva — ${data.resourceName}`,
-      text: [
-        `Nueva reserva recibida:`,
-        "",
-        `  Cliente: ${data.bookerName} (${data.bookerEmail})`,
-        `  Local: ${data.locationName}`,
-        `  Recurso: ${data.resourceName}`,
-        `  Fecha: ${data.date}`,
-        `  Hora: ${data.startTime}`,
-        `  Duración: ${data.durationHours} ${data.durationHours === 1 ? "hora" : "horas"}`,
-        `  Total: ${formatCLP(data.totalPrice)}`,
-        "",
-        `Estado: Pendiente de confirmación.`,
-        "",
-        `— Bukarrum`,
-      ].join("\n"),
+      html: emailLayout(bodyHtml, {
+        preheaderText: `${data.bookerName} reservó ${data.resourceName}`,
+      }),
+      text,
     });
   } catch (err) {
     console.error("Failed to send new booking notification:", err);
@@ -93,21 +127,21 @@ export async function sendNewBookingNotification(data: BookingEmailData) {
 const STATUS_LABELS: Record<string, { subject: string; message: string }> = {
   confirmed: {
     subject: "Reserva confirmada",
-    message: "Tu reserva ha sido confirmada. ¡Te esperamos!",
+    message: "Tu reserva está confirmada. Llega, crea.",
   },
   cancelled: {
     subject: "Reserva cancelada",
     message:
-      "Tu reserva ha sido cancelada. Si tienes dudas, contacta al establecimiento.",
+      "Tu reserva fue cancelada. Dudas: contacta al establecimiento.",
   },
   completed: {
     subject: "Reserva completada",
-    message: "Tu reserva ha sido marcada como completada. ¡Gracias por visitarnos!",
+    message: "Reserva completada. Gracias por la visita.",
   },
   no_show: {
     subject: "Reserva — No asistencia",
     message:
-      "Tu reserva fue marcada como no asistencia. Si fue un error, contacta al establecimiento.",
+      "Reserva marcada como no asistencia. Si fue un error, contacta al establecimiento.",
   },
 };
 
@@ -126,30 +160,27 @@ interface StatusChangeData {
  */
 export async function sendBookingStatusChange(data: StatusChangeData) {
   const label = STATUS_LABELS[data.newStatus];
-  if (!label) return; // Don't email for "pending" status
+  if (!label) return;
 
   try {
     const resend = getResend();
     if (!resend) return;
+
+    const { bodyHtml, text } = bookingStatusChangeContent(data, label);
+
     await resend.emails.send({
       from: FROM,
       to: [data.bookerEmail],
       subject: `${label.subject} — ${data.resourceName}`,
-      text: [
-        `Hola ${data.bookerName},`,
-        "",
-        label.message,
-        "",
-        `Detalles:`,
-        `  Local: ${data.locationName}`,
-        `  Recurso: ${data.resourceName}`,
-        `  Fecha: ${data.date}`,
-        `  Hora: ${data.startTime}`,
-        "",
-        `— Bukarrum`,
-      ].join("\n"),
+      html: emailLayout(bodyHtml, {
+        preheaderText: `${label.subject} — ${data.resourceName}`,
+      }),
+      text,
     });
   } catch (err) {
     console.error("Failed to send booking status change email:", err);
   }
 }
+
+// Re-export for use in booking actions
+export { formatCLP };

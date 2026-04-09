@@ -306,6 +306,8 @@ export async function createBooking(formData: FormData) {
       startTime,
       durationHours,
       totalPrice,
+      startISO,
+      endISO,
     };
 
     sendBookingConfirmation(emailData);
