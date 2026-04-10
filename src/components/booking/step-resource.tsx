@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getResourcesForLocation } from "@/app/(booking)/[tenantSlug]/actions";
 import { useDict } from "@/lib/i18n/dict-context";
 
-type Resource = {
+export type Resource = {
   id: string;
   name: string;
   description: string | null;
@@ -27,9 +27,11 @@ const fmt = new Intl.NumberFormat("es-CL", {
 
 export function StepResource({
   locationId,
+  initialResources,
   dispatch,
 }: {
   locationId: string;
+  initialResources: Resource[] | null;
   dispatch: React.Dispatch<{
     type: "SELECT_RESOURCE";
     resourceId: string;
@@ -40,15 +42,18 @@ export function StepResource({
   }>;
 }) {
   const { booking, common } = useDict();
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [resources, setResources] = useState<Resource[]>(
+    initialResources ?? []
+  );
+  const [loading, setLoading] = useState(initialResources === null);
 
   useEffect(() => {
+    if (initialResources !== null) return;
     getResourcesForLocation(locationId).then((data) => {
       setResources(data as Resource[]);
       setLoading(false);
     });
-  }, [locationId]);
+  }, [locationId, initialResources]);
 
   if (loading) {
     return (
@@ -68,7 +73,7 @@ export function StepResource({
     <div>
       <h2 className="text-lg font-semibold mb-4">{booking.selectResource}</h2>
       <div className="grid gap-3">
-        {resources.map((res) => (
+        {resources.map((res, index) => (
           <Card
             key={res.id}
             className="cursor-pointer hover:border-primary transition-colors"
@@ -93,6 +98,7 @@ export function StepResource({
                     className="object-cover"
                     sizes="(max-width: 512px) 100vw, 512px"
                     unoptimized
+                    priority={index === 0}
                   />
                 </div>
               )}

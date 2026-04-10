@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useDict } from "@/lib/i18n/dict-context";
 import { StepLocation } from "./step-location";
-import { StepResource } from "./step-resource";
+import { StepResource, type Resource } from "./step-resource";
 import { StepDate } from "./step-date";
 import { StepTime } from "./step-time";
 import { StepDuration } from "./step-duration";
@@ -131,10 +131,12 @@ export function BookingFlow({
   tenantId,
   tenantName,
   locations,
+  initialResources,
 }: {
   tenantId: string;
   tenantName: string;
   locations: Location[];
+  initialResources: Resource[] | null;
 }) {
   const { booking } = useDict();
   const skipLocation = locations.length === 1;
@@ -202,7 +204,17 @@ export function BookingFlow({
         <StepLocation locations={locations} dispatch={dispatch} />
       )}
       {state.step === "resource" && state.locationId && (
-        <StepResource locationId={state.locationId} dispatch={dispatch} />
+        <StepResource
+          locationId={state.locationId}
+          initialResources={
+            // Only reuse prefetched data for the location it was fetched for
+            // (the single-location skipLocation case).
+            initialResources && state.locationId === locations[0]?.id
+              ? initialResources
+              : null
+          }
+          dispatch={dispatch}
+        />
       )}
       {state.step === "date" && state.resourceId && state.locationTimezone && (
         <StepDate

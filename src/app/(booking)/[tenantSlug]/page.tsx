@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { BookingFlow } from "@/components/booking/booking-flow";
+import { getResourcesForLocation } from "./actions";
 
 export async function generateMetadata({
   params,
@@ -77,12 +78,21 @@ export default async function BookingPage({
     );
   }
 
+  // Prefetch resources when there's only one location so StepResource can
+  // hydrate without a client-side round-trip (the first resource image is
+  // the LCP element in that flow).
+  const initialResources =
+    readyLocations.length === 1
+      ? await getResourcesForLocation(readyLocations[0].id)
+      : null;
+
   return (
     <main className="min-h-screen">
       <BookingFlow
         tenantId={tenant.id}
         tenantName={tenant.name}
         locations={readyLocations}
+        initialResources={initialResources}
       />
     </main>
   );
