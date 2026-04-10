@@ -15,7 +15,12 @@ const MOCK_BOOKING = {
   date: "lunes 14 de abril",
   startTime: "14:00",
   durationHours: 2,
-  totalPrice: 40000,
+  resourcePrice: 30000,
+  addOns: [
+    { id: "mock-1", name: "Ingeniero de Sonido", price: 40000 },
+    { id: "mock-2", name: "Fotógrafo", price: 50000 },
+  ],
+  totalPrice: 120000,
   startISO: "2025-04-14T18:00:00.000Z",
   endISO: "2025-04-14T20:00:00.000Z",
 };

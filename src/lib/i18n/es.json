@@ -154,7 +154,15 @@
     "addOnsSubtitle": "Opcional — selecciona los que desees",
     "continueWithSelection": "Continuar con selección",
     "continueWithout": "Continuar sin adicionales",
-    "stepLabels": ["Local", "Recurso", "Fecha", "Hora", "Duración", "Extras", "Confirmar"]
+    "stepLabels": ["Local", "Recurso", "Fecha", "Hora", "Duración", "Extras", "Confirmar"],
+    "errors": {
+      "MISSING_FIELDS": "Faltan datos requeridos",
+      "RATE_LIMITED": "Demasiados intentos. Intenta de nuevo más tarde.",
+      "BOOKER_ERROR": "Error al registrar datos de contacto",
+      "RESOURCE_NOT_FOUND": "Recurso no encontrado",
+      "INVALID_ADD_ONS": "Servicio adicional inválido para esta ubicación",
+      "GENERIC": "No se pudo crear la reserva. Intenta nuevamente."
+    }
   },
   "dashboard": {
     "title": "Panel de administración",

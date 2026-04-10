@@ -6,6 +6,12 @@ import {
   formatCLP,
 } from "./components";
 
+interface BookingLineItem {
+  id: string;
+  name: string;
+  price: number;
+}
+
 interface BookingEmailData {
   bookerName: string;
   bookerEmail: string;
@@ -14,6 +20,8 @@ interface BookingEmailData {
   date: string;
   startTime: string;
   durationHours: number;
+  resourcePrice: number;
+  addOns: BookingLineItem[];
   totalPrice: number;
 }
 
@@ -23,21 +31,28 @@ export function newBookingNotificationContent(data: BookingEmailData): {
 } {
   const durationLabel = data.durationHours === 1 ? "hora" : "horas";
 
+  const rows = [
+    detailRow("Cliente", `${data.bookerName} (${data.bookerEmail})`),
+    detailRow("Local", data.locationName),
+    detailRow("Recurso", data.resourceName),
+    detailRow("Fecha", data.date),
+    detailRow("Hora", data.startTime),
+    detailRow("Duración", `${data.durationHours} ${durationLabel}`),
+    detailRow(data.resourceName, formatCLP(data.resourcePrice)),
+    ...data.addOns.map((a) => detailRow(a.name, formatCLP(a.price))),
+    detailRow("Total", formatCLP(data.totalPrice)),
+  ];
+
   const bodyHtml = [
     heading("Nueva reserva"),
     statusBadge("pending", "Pendiente de confirmación"),
-    detailCard(
-      [
-        detailRow("Cliente", `${data.bookerName} (${data.bookerEmail})`),
-        detailRow("Local", data.locationName),
-        detailRow("Recurso", data.resourceName),
-        detailRow("Fecha", data.date),
-        detailRow("Hora", data.startTime),
-        detailRow("Duración", `${data.durationHours} ${durationLabel}`),
-        detailRow("Total", formatCLP(data.totalPrice)),
-      ].join("")
-    ),
+    detailCard(rows.join("")),
   ].join("");
+
+  const lineItemLines = [
+    `  ${data.resourceName}: ${formatCLP(data.resourcePrice)}`,
+    ...data.addOns.map((a) => `  ${a.name}: ${formatCLP(a.price)}`),
+  ];
 
   const text = [
     "Nueva reserva recibida:",
@@ -48,6 +63,9 @@ export function newBookingNotificationContent(data: BookingEmailData): {
     `  Fecha: ${data.date}`,
     `  Hora: ${data.startTime}`,
     `  Duración: ${data.durationHours} ${durationLabel}`,
+    "",
+    "Desglose:",
+    ...lineItemLines,
     `  Total: ${formatCLP(data.totalPrice)}`,
     "",
     "Estado: Pendiente de confirmación.",

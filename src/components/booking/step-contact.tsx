@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { createBooking } from "@/app/(booking)/[tenantSlug]/actions";
+import { createBooking, type BookingErrorCode } from "@/app/(booking)/[tenantSlug]/actions";
 import type { BookingState } from "./booking-flow";
 import { useDict } from "@/lib/i18n/dict-context";
 
@@ -54,10 +54,14 @@ export function StepContact({
     setLoading(false);
 
     if (result.error) {
+      // BOOKING_CONFLICT has a dedicated, more contextual string
+      // ("this time slot is no longer available") — everything else
+      // flows through the generic errors map.
       if (result.error === "BOOKING_CONFLICT") {
         setError(booking.unavailableSlot);
       } else {
-        setError(result.error);
+        const code: Exclude<BookingErrorCode, "BOOKING_CONFLICT"> = result.error;
+        setError(booking.errors[code]);
       }
       return;
     }

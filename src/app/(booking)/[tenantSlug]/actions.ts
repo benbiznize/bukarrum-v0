@@ -12,6 +12,20 @@ import { rateLimit } from "@/lib/rate-limit";
 
 type DayOfWeek = Database["public"]["Enums"]["day_of_week"];
 
+/**
+ * Machine-readable error codes returned by {@link createBooking}. The client
+ * maps these to localized strings via the `booking.errors` dictionary; the
+ * server never returns user-facing strings directly.
+ */
+export type BookingErrorCode =
+  | "MISSING_FIELDS"
+  | "RATE_LIMITED"
+  | "BOOKER_ERROR"
+  | "BOOKING_CONFLICT"
+  | "RESOURCE_NOT_FOUND"
+  | "INVALID_ADD_ONS"
+  | "GENERIC";
+
 export async function getResourcesForLocation(locationId: string) {
   const supabase = await createClient();
 
@@ -177,7 +191,9 @@ export async function getTimeSlots(
   return slots;
 }
 
-export async function createBooking(formData: FormData) {
+export async function createBooking(
+  formData: FormData
+): Promise<{ error: ""; bookingId: string } | { error: BookingErrorCode }> {
   const resourceId = formData.get("resourceId") as string;
   const locationId = formData.get("locationId") as string;
   const date = formData.get("date") as string;
@@ -189,35 +205,23 @@ export async function createBooking(formData: FormData) {
   const timezone = formData.get("timezone") as string;
 
   if (!resourceId || !locationId || !date || !startTime || !durationHours || !name || !email) {
-    return { error: "Faltan datos requeridos" };
+    return { error: "MISSING_FIELDS" };
   }
 
   const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
   const { success } = await rateLimit("booking", ip);
   if (!success) {
-    return { error: "Demasiados intentos. Intenta de nuevo más tarde." };
+    return { error: "RATE_LIMITED" };
   }
 
   const supabase = await createClient();
 
-  // Fetch the resource to get the authoritative hourly rate
-  const { data: resource } = await supabase
-    .from("resources")
-    .select("hourly_rate")
-    .eq("id", resourceId)
-    .single();
-
-  if (!resource) return { error: "Recurso no encontrado" };
-
-  // Parse add-ons from FormData
+  // Parse add-on ids from FormData. We ignore any client-sent prices —
+  // the RPC computes the authoritative total from the catalog.
   const addOnsRaw = formData.get("addOns") as string | null;
-  const addOns: { id: string; name: string; price: number }[] = addOnsRaw
-    ? JSON.parse(addOnsRaw)
+  const addOnIds: string[] = addOnsRaw
+    ? (JSON.parse(addOnsRaw) as { id: string }[]).map((a) => a.id)
     : [];
-
-  const resourcePrice = resource.hourly_rate * durationHours;
-  const addOnsPrice = addOns.reduce((sum, a) => sum + a.price, 0);
-  const totalPrice = resourcePrice + addOnsPrice;
 
   // Compute timestamps
   const startISO = toTimestampTZ(date, startTime, timezone);
@@ -231,10 +235,12 @@ export async function createBooking(formData: FormData) {
     { p_email: email, p_name: name, p_phone: phone ?? undefined }
   );
 
-  if (bookerError) return { error: "Error al registrar datos de contacto" };
+  if (bookerError) return { error: "BOOKER_ERROR" };
 
-  // Create booking atomically with overlap check
-  const { data: bookingId, error: bookingError } = await supabase.rpc(
+  // Create booking + add-on line items atomically inside one transaction.
+  // The RPC fetches prices from the catalog itself, so totals can't be
+  // spoofed from the client.
+  const { data: rpcResult, error: bookingError } = await supabase.rpc(
     "create_booking_if_available",
     {
       p_resource_id: resourceId,
@@ -243,27 +249,30 @@ export async function createBooking(formData: FormData) {
       p_start_time: startISO,
       p_end_time: endISO,
       p_duration_hours: durationHours,
-      p_total_price: totalPrice,
+      p_add_on_ids: addOnIds,
     }
   );
 
   if (bookingError) {
-    if (bookingError.message?.includes("BOOKING_CONFLICT")) {
-      return { error: "BOOKING_CONFLICT" };
-    }
-    return { error: "Error al crear la reserva" };
+    const msg = bookingError.message ?? "";
+    let code: BookingErrorCode = "GENERIC";
+    if (msg.includes("BOOKING_CONFLICT")) code = "BOOKING_CONFLICT";
+    else if (msg.includes("RESOURCE_NOT_FOUND")) code = "RESOURCE_NOT_FOUND";
+    else if (msg.includes("INVALID_ADD_ONS")) code = "INVALID_ADD_ONS";
+    return { error: code };
   }
 
-  // Insert add-on snapshots
-  if (addOns.length > 0 && bookingId) {
-    await supabase.from("booking_add_ons").insert(
-      addOns.map((a) => ({
-        booking_id: bookingId,
-        add_on_service_id: a.id,
-        price: a.price,
-      }))
-    );
-  }
+  const {
+    booking_id: bookingId,
+    total_price: totalPrice,
+    resource_price: resourcePrice,
+    add_ons: addOns,
+  } = rpcResult as {
+    booking_id: string;
+    total_price: number;
+    resource_price: number;
+    add_ons: { id: string; name: string; price: number }[];
+  };
 
   // Send emails (fire-and-forget — don't block the response)
   const { data: resourceData } = await supabase
@@ -305,6 +314,8 @@ export async function createBooking(formData: FormData) {
       date: dateDisplay,
       startTime,
       durationHours,
+      resourcePrice,
+      addOns,
       totalPrice,
       startISO,
       endISO,

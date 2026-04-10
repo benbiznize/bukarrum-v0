@@ -43,6 +43,12 @@ function generateICS(data: {
   ].join("\r\n");
 }
 
+export interface BookingLineItem {
+  id: string;
+  name: string;
+  price: number;
+}
+
 interface BookingEmailData {
   bookerName: string;
   bookerEmail: string;
@@ -53,6 +59,8 @@ interface BookingEmailData {
   date: string;
   startTime: string;
   durationHours: number;
+  resourcePrice: number;
+  addOns: BookingLineItem[];
   totalPrice: number;
   startISO: string;
   endISO: string;

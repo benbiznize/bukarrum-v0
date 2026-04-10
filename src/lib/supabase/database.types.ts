@@ -512,15 +512,15 @@ export type Database = {
     Functions: {
       create_booking_if_available: {
         Args: {
+          p_add_on_ids?: string[]
           p_booker_id: string
           p_duration_hours: number
           p_end_time: string
           p_location_id: string
           p_resource_id: string
           p_start_time: string
-          p_total_price: number
         }
-        Returns: string
+        Returns: Json
       }
       get_bookings_for_resource: {
         Args: { p_end: string; p_resource_id: string; p_start: string }

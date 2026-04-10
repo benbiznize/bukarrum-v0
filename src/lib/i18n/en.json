@@ -154,7 +154,15 @@
     "addOnsSubtitle": "Optional — select the ones you want",
     "continueWithSelection": "Continue with selection",
     "continueWithout": "Continue without add-ons",
-    "stepLabels": ["Location", "Resource", "Date", "Time", "Duration", "Extras", "Confirm"]
+    "stepLabels": ["Location", "Resource", "Date", "Time", "Duration", "Extras", "Confirm"],
+    "errors": {
+      "MISSING_FIELDS": "Missing required fields",
+      "RATE_LIMITED": "Too many attempts. Please try again later.",
+      "BOOKER_ERROR": "Error registering contact details",
+      "RESOURCE_NOT_FOUND": "Resource not found",
+      "INVALID_ADD_ONS": "Invalid add-on service for this location",
+      "GENERIC": "Could not create the booking. Please try again."
+    }
   },
   "dashboard": {
     "title": "Admin Dashboard",
