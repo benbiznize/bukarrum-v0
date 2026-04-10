@@ -72,7 +72,8 @@ export default async function BookingsPage({
       ),
       location:locations(
         id,
-        name
+        name,
+        timezone
       ),
       booker:bookers!inner(
         id,
@@ -92,22 +93,28 @@ export default async function BookingsPage({
       minimumFractionDigits: 0,
     }).format(amount);
 
-  const formatDateTime = (iso: string) => {
-    const dt = new Date(iso);
-    return dt.toLocaleDateString("es-CL", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const locale = await getLocale();
   const dict = await getDictionary(locale);
   const d = dict.dashboard;
   const statusLabels = d.statusLabels as Record<string, string>;
   const paymentLabels = d.paymentLabels as Record<string, string>;
+
+  // Format a UTC timestamp in the booking's own location timezone. Timezone is
+  // pinned per row (multi-city tenants may span zones) rather than inherited
+  // from the server process. Whitespace is normalized to guard against the
+  // Node-vs-browser U+202F divergence around day-period markers, so this
+  // output stays stable if the page is ever converted to a Client Component.
+  const formatDateTime = (iso: string, timeZone: string) =>
+    new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-CL", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone,
+    })
+      .format(new Date(iso))
+      .replace(/[\u202F\u00A0]/g, " ");
 
   return (
     <div className="p-6">
@@ -141,7 +148,9 @@ export default async function BookingsPage({
                 const location = booking.location as unknown as {
                   id: string;
                   name: string;
+                  timezone: string;
                 } | null;
+                const tz = location?.timezone ?? "America/Santiago";
                 const booker = booking.booker as unknown as {
                   id: string;
                   name: string;
@@ -157,7 +166,7 @@ export default async function BookingsPage({
                         href={detailHref}
                         className="hover:underline"
                       >
-                        {formatDateTime(booking.start_time)}
+                        {formatDateTime(booking.start_time, tz)}
                       </Link>
                     </TableCell>
                     <TableCell className="font-medium">

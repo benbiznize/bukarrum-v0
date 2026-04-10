@@ -143,7 +143,7 @@ export function BookingPaymentPanel({
     });
   };
 
-  function mapServerError(code: string, type: PaymentEntryType): FormError {
+  function mapServerError(code: string): FormError {
     if (code === "OVERPAY") {
       return {
         field: "amount",
@@ -209,7 +209,7 @@ export function BookingPaymentPanel({
           : await recordBookingPayment(tenantSlug, bookingId, input);
 
       if (result.error) {
-        const mapped = mapServerError(result.error, dialog.type);
+        const mapped = mapServerError(result.error);
         setFormError(mapped);
         if (mapped.field === "amount") focusAmount();
         return;
