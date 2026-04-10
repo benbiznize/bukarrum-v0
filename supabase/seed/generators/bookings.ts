@@ -199,6 +199,28 @@ export function assignPaymentState(
 }
 
 /**
+ * Back-date the booking's `created_at` (sale date) so analytics'
+ * revenue-over-time chart shows a realistic curve instead of a single
+ * spike on seed day.
+ *
+ * - Future bookings (start > now): sale happened 0-30 days before now.
+ * - Past bookings (start <= now): sale happened 0-30 days before start.
+ *
+ * Result is clamped to never be in the future of `now`.
+ */
+export function pickCreatedAt(start: Date, now: Date): Date {
+  const isFuture = start.getTime() > now.getTime();
+  const anchor = isFuture ? now : start;
+  const leadDays = fakerEs.number.int({ min: 0, max: 30 });
+  const leadMinutes = fakerEs.number.int({ min: 0, max: 1439 });
+  const createdMs = anchor.getTime() - leadDays * 86_400_000 - leadMinutes * 60_000;
+  // Clamp: created_at must never be after `now` (can't have been booked
+  // "in the future"), and must never be after the session itself.
+  const maxMs = Math.min(now.getTime(), start.getTime());
+  return new Date(Math.min(createdMs, maxMs));
+}
+
+/**
  * 40% chance the booking has add-ons. Pick 1-2 random add-ons from
  * the resource's catalog. Returns priced line items ready to insert.
  */
@@ -238,6 +260,7 @@ interface BookingRowData {
   totalPrice: number;
   status: BookingStatus;
   notes: string | null;
+  createdAt: Date;
 }
 
 async function insertBooking(sql: Sql, data: BookingRowData): Promise<string> {
@@ -245,11 +268,11 @@ async function insertBooking(sql: Sql, data: BookingRowData): Promise<string> {
     insert into public.bookings (
       resource_id, location_id, booker_id,
       start_time, end_time, duration_hours,
-      total_price, status, notes
+      total_price, status, notes, created_at
     ) values (
       ${data.resourceId}, ${data.locationId}, ${data.bookerId},
       ${data.start.toISOString()}, ${data.end.toISOString()}, ${data.durationHours},
-      ${data.totalPrice}, ${data.status}, ${data.notes}
+      ${data.totalPrice}, ${data.status}, ${data.notes}, ${data.createdAt.toISOString()}
     )
     returning id
   `;
@@ -346,6 +369,7 @@ export async function seedBookingsForTenant(
       fakerEs.number.float({ min: 0, max: 1 }) < 0.15
         ? fakerEs.lorem.sentence({ min: 4, max: 10 })
         : null;
+    const createdAt = pickCreatedAt(slot.start, now);
 
     const bookingId = await insertBooking(sql, {
       resourceId: slot.resourceId,
@@ -357,6 +381,7 @@ export async function seedBookingsForTenant(
       totalPrice,
       status,
       notes,
+      createdAt,
     });
 
     await insertBookingAddOns(sql, bookingId, addOns);
