@@ -17,6 +17,24 @@ export const fakerEs = new Faker({ locale: [es, en, base] });
 fakerEs.seed(Number.isFinite(SEED) ? SEED : 42);
 
 /**
+ * Frozen "now" for the seed run.
+ *
+ * Booking status distributions depend on whether the start time is in
+ * the past or future. If we used `new Date()` everywhere, every reset
+ * would roll a different past/future split and a different status mix
+ * — silently breaking the reproducibility promise above.
+ *
+ * Default anchor is 2026-04-10T12:00:00Z (the plan's authoring date).
+ * Override with SEED_NOW_ISO=YYYY-MM-DDTHH:MM:SSZ when you want a
+ * different temporal slice (e.g. to populate a fresh "next week").
+ */
+const nowEnv = process.env.SEED_NOW_ISO;
+const parsedNow = nowEnv ? new Date(nowEnv) : new Date('2026-04-10T12:00:00Z');
+export const SEED_NOW: Date = Number.isNaN(parsedNow.getTime())
+  ? new Date('2026-04-10T12:00:00Z')
+  : parsedNow;
+
+/**
  * Chilean mobile number generator. The faker `es` locale produces
  * Spain-style numbers, so we roll our own to keep bookers realistic
  * and consistent with the CL domain.

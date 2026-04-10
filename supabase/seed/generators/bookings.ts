@@ -1,4 +1,4 @@
-import { fakerEs } from '../lib/faker';
+import { fakerEs, SEED_NOW } from '../lib/faker';
 import type { Sql } from '../lib/db';
 import type {
   BookingOptions,
@@ -313,7 +313,7 @@ export async function seedBookingsForTenant(
     return { created: 0, skipped: 0 };
   }
 
-  const now = new Date();
+  const now = SEED_NOW;
   const existing: ExistingSlot[] = [];
   let created = 0;
   let skipped = 0;
