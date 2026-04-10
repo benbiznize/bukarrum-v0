@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { BookingFlow } from "@/components/booking/booking-flow";
-import { getResourcesForLocation } from "./actions";
+import { getBookingPageData } from "@/lib/booking/queries";
 
 export async function generateMetadata({
   params,
@@ -10,16 +9,13 @@ export async function generateMetadata({
   params: Promise<{ tenantSlug: string }>;
 }): Promise<Metadata> {
   const { tenantSlug } = await params;
-  const supabase = await createClient();
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select("name")
-    .eq("slug", tenantSlug)
-    .single();
+  const data = await getBookingPageData(tenantSlug);
 
   return {
-    title: tenant ? `Reservar en ${tenant.name} — Bukarrum` : "Reservar — Bukarrum",
-    description: tenant ? `Reserva tu espacio en ${tenant.name}` : undefined,
+    title: data
+      ? `Reservar en ${data.tenant.name} — Bukarrum`
+      : "Reservar — Bukarrum",
+    description: data ? `Reserva tu espacio en ${data.tenant.name}` : undefined,
   };
 }
 
@@ -29,43 +25,11 @@ export default async function BookingPage({
   params: Promise<{ tenantSlug: string }>;
 }) {
   const { tenantSlug } = await params;
-  const supabase = await createClient();
+  const data = await getBookingPageData(tenantSlug);
 
-  // Fetch tenant
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select("id, name")
-    .eq("slug", tenantSlug)
-    .single();
+  if (!data) notFound();
 
-  if (!tenant) notFound();
-
-  // Fetch active locations that have at least one active resource assigned
-  const { data: locationRows } = await supabase
-    .from("locations")
-    .select("id, name, address, city, timezone, image_url")
-    .eq("tenant_id", tenant.id)
-    .eq("is_active", true)
-    .order("name");
-
-  const locations = locationRows ?? [];
-
-  // Filter to locations that have at least one resource
-  const { data: rlRows } = await supabase
-    .from("resource_locations")
-    .select("location_id")
-    .in(
-      "location_id",
-      locations.map((l) => l.id)
-    );
-
-  const locationsWithResources = new Set(
-    (rlRows ?? []).map((r) => r.location_id)
-  );
-
-  const readyLocations = locations.filter((l) =>
-    locationsWithResources.has(l.id)
-  );
+  const { tenant, readyLocations, initialResources } = data;
 
   if (readyLocations.length === 0) {
     return (
@@ -77,14 +41,6 @@ export default async function BookingPage({
       </main>
     );
   }
-
-  // Prefetch resources when there's only one location so StepResource can
-  // hydrate without a client-side round-trip (the first resource image is
-  // the LCP element in that flow).
-  const initialResources =
-    readyLocations.length === 1
-      ? await getResourcesForLocation(readyLocations[0].id)
-      : null;
 
   return (
     <main className="min-h-screen">

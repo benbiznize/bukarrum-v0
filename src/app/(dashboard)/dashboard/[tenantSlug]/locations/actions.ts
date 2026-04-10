@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { checkLocationLimit } from "@/lib/plans/check-limit";
+import { revalidateBookingPage } from "@/lib/booking/queries";
 
 function slugify(name: string): string {
   return name
@@ -66,6 +67,7 @@ export async function createLocation(tenantSlug: string, formData: FormData) {
   }
 
   revalidatePath(`/dashboard/${tenantSlug}`);
+  revalidateBookingPage(tenantSlug);
   redirect(`/dashboard/${tenantSlug}/locations`);
 }
 
@@ -101,6 +103,7 @@ export async function updateLocation(
   }
 
   revalidatePath(`/dashboard/${tenantSlug}`);
+  revalidateBookingPage(tenantSlug);
   redirect(`/dashboard/${tenantSlug}/locations`);
 }
 
@@ -121,5 +124,6 @@ export async function deleteLocation(tenantSlug: string, locationId: string) {
   }
 
   revalidatePath(`/dashboard/${tenantSlug}`);
+  revalidateBookingPage(tenantSlug);
   redirect(`/dashboard/${tenantSlug}/locations`);
 }

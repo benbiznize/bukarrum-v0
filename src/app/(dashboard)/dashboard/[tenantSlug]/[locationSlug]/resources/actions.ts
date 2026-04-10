@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
 import { checkResourceLimit } from "@/lib/plans/check-limit";
+import { revalidateBookingPage } from "@/lib/booking/queries";
 
 type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -72,6 +73,7 @@ export async function createResource(
   });
 
   revalidatePath(`/dashboard/${tenantSlug}/${locationSlug}`);
+  revalidateBookingPage(tenantSlug);
   redirect(`/dashboard/${tenantSlug}/${locationSlug}`);
 }
 
@@ -119,5 +121,6 @@ export async function updateResource(
   }
 
   revalidatePath(`/dashboard/${tenantSlug}/${locationSlug}`);
+  revalidateBookingPage(tenantSlug);
   redirect(`/dashboard/${tenantSlug}/${locationSlug}`);
 }

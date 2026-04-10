@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidateBookingPage } from "@/lib/booking/queries";
 
 function slugify(name: string): string {
   return name
@@ -21,7 +22,7 @@ export async function createFirstLocation(formData: FormData) {
 
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("id")
+    .select("id, slug")
     .eq("user_id", user.id)
     .single();
 
@@ -54,5 +55,6 @@ export async function createFirstLocation(formData: FormData) {
     return { error: "Algo salió mal. Intenta nuevamente." };
   }
 
+  revalidateBookingPage(tenant.slug);
   redirect("/onboarding/resource");
 }

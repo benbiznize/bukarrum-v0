@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Database } from "@/lib/supabase/database.types";
+import { revalidateBookingPage } from "@/lib/booking/queries";
 
 type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -64,5 +65,6 @@ export async function createFirstResource(formData: FormData) {
     location_id: location.id,
   });
 
+  revalidateBookingPage(tenant.slug);
   redirect(`/dashboard/${tenant.slug}`);
 }
