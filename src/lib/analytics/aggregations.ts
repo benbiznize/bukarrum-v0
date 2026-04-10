@@ -12,6 +12,8 @@ export type RevenueOverTimePoint = {
 
 /**
  * Group non-cancelled bookings by day or week and sum revenue.
+ * Buckets by `created_at` (sale date), so the chart answers
+ * "how much did I earn per day" rather than "how busy per day".
  */
 export function aggregateRevenueOverTime(
   bookings: AnalyticsBooking[],
@@ -22,7 +24,7 @@ export function aggregateRevenueOverTime(
   for (const b of bookings) {
     if (b.status === "cancelled") continue;
 
-    const parsed = parseISO(b.start_time);
+    const parsed = parseISO(b.created_at);
     const key =
       interval === "day"
         ? format(parsed, "yyyy-MM-dd")
@@ -116,6 +118,9 @@ const EMPTY_STATUS_COUNTS = {
 
 /**
  * Count bookings per time bucket grouped by status (all statuses included).
+ * Buckets by `created_at` (sale date) so the chart aligns with the
+ * revenue chart above — both answer "what happened each day" in terms
+ * of sales activity, not scheduled sessions.
  */
 export function aggregateBookingsByStatus(
   bookings: AnalyticsBooking[],
@@ -124,7 +129,7 @@ export function aggregateBookingsByStatus(
   const map = new Map<string, BookingsByStatusPoint>();
 
   for (const b of bookings) {
-    const parsed = parseISO(b.start_time);
+    const parsed = parseISO(b.created_at);
     const key =
       interval === "day"
         ? format(parsed, "yyyy-MM-dd")

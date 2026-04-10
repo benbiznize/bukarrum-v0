@@ -6,6 +6,7 @@ export type AnalyticsBooking = {
   id: string;
   start_time: string;
   end_time: string;
+  created_at: string;
   duration_hours: number;
   total_price: number;
   status: string;
@@ -19,17 +20,29 @@ export type AnalyticsBooking = {
 };
 
 /**
+ * Which booking timestamp the date range filters on.
+ *
+ * - "created_at" — when the booking was made (sales / revenue view)
+ * - "start_time" — when the session is scheduled (utilization view)
+ */
+export type BookingDateField = "created_at" | "start_time";
+
+/**
  * Fetch bookings with resource/location/booker joins for analytics.
  *
  * Filters by tenant (via resources!inner), date range, and optionally
- * by location or resource.
+ * by location or resource. The `dateField` parameter selects which
+ * timestamp the `[from, to)` window applies to — defaults to `created_at`
+ * so revenue numbers reflect sales in the window, matching the Overview
+ * page's semantics.
  */
 export async function fetchAnalyticsBookings(
   tenantId: string,
   from: string,
   to: string,
   locationId?: string,
-  resourceId?: string
+  resourceId?: string,
+  dateField: BookingDateField = "created_at"
 ): Promise<AnalyticsBooking[]> {
   const supabase = await createClient();
 
@@ -40,6 +53,7 @@ export async function fetchAnalyticsBookings(
       id,
       start_time,
       end_time,
+      created_at,
       duration_hours,
       total_price,
       status,
@@ -60,9 +74,9 @@ export async function fetchAnalyticsBookings(
     `
     )
     .eq("resource.tenant_id", tenantId)
-    .gte("start_time", from)
-    .lt("start_time", to)
-    .order("start_time", { ascending: true });
+    .gte(dateField, from)
+    .lt(dateField, to)
+    .order(dateField, { ascending: true });
 
   if (locationId) {
     query = query.eq("location_id", locationId);
@@ -100,6 +114,7 @@ export async function fetchAnalyticsBookings(
       id: row.id,
       start_time: row.start_time,
       end_time: row.end_time,
+      created_at: row.created_at,
       duration_hours: row.duration_hours,
       total_price: row.total_price,
       status: row.status,

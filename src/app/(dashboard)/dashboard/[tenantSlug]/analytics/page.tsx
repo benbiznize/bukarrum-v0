@@ -79,37 +79,67 @@ export default async function AnalyticsPage({
   const rangeDays = differenceInDays(toDate, fromDate);
   const interval: "day" | "week" = rangeDays > 60 ? "week" : "day";
 
-  // Fetch data in parallel
-  const [bookings, availability, resourcesResult, locationsResult] =
-    await Promise.all([
-      fetchAnalyticsBookings(tenant.id, fromStr, toStr, locationId, resourceId),
-      fetchAvailability(tenant.id),
-      supabase
-        .from("resources")
-        .select("id, name")
-        .eq("tenant_id", tenant.id)
-        .eq("is_active", true)
-        .order("name"),
-      supabase
-        .from("locations")
-        .select("id, name")
-        .eq("tenant_id", tenant.id)
-        .order("name"),
-    ]);
+  // Fetch data in parallel.
+  //
+  // Two separate booking fetches, by design:
+  //
+  // - `revenueBookings` — filtered by `created_at` (sale date). Feeds every
+  //   revenue / volume / customer aggregation so "last 30 days" means
+  //   "sales made in the last 30 days," matching Overview's mental model.
+  //
+  // - `utilizationBookings` — filtered by `start_time` (session date). Feeds
+  //   `calculateUtilization`, which compares booked hours against available
+  //   hours inside the calendar window — inherently a start_time concept.
+  const [
+    revenueBookings,
+    utilizationBookings,
+    availability,
+    resourcesResult,
+    locationsResult,
+  ] = await Promise.all([
+    fetchAnalyticsBookings(
+      tenant.id,
+      fromStr,
+      toStr,
+      locationId,
+      resourceId,
+      "created_at"
+    ),
+    fetchAnalyticsBookings(
+      tenant.id,
+      fromStr,
+      toStr,
+      locationId,
+      resourceId,
+      "start_time"
+    ),
+    fetchAvailability(tenant.id),
+    supabase
+      .from("resources")
+      .select("id, name")
+      .eq("tenant_id", tenant.id)
+      .eq("is_active", true)
+      .order("name"),
+    supabase
+      .from("locations")
+      .select("id, name")
+      .eq("tenant_id", tenant.id)
+      .order("name"),
+  ]);
 
   const resources = resourcesResult.data ?? [];
   const locations = locationsResult.data ?? [];
 
-  // Run all aggregations
-  const revenueOverTime = aggregateRevenueOverTime(bookings, interval);
-  const revenueByResource = aggregateRevenueByResource(bookings);
+  // Revenue / volume / customer aggregations — sales perspective
+  const revenueOverTime = aggregateRevenueOverTime(revenueBookings, interval);
+  const revenueByResource = aggregateRevenueByResource(revenueBookings);
   const analyticsView = (dict.dashboard as Record<string, unknown>).analyticsView as Record<string, string>;
-  const revenueByLocation = aggregateRevenueByLocation(bookings, analyticsView.noLocation);
-  const bookingsByStatus = aggregateBookingsByStatus(bookings, interval);
-  const topCustomers = aggregateTopCustomers(bookings);
-  const summaryStats = computeSummaryStats(bookings);
+  const revenueByLocation = aggregateRevenueByLocation(revenueBookings, analyticsView.noLocation);
+  const bookingsByStatus = aggregateBookingsByStatus(revenueBookings, interval);
+  const topCustomers = aggregateTopCustomers(revenueBookings);
+  const summaryStats = computeSummaryStats(revenueBookings);
 
-  // Calculate utilization
+  // Utilization — calendar / session perspective
   const availabilityRows = (availability ?? []).map((a) => ({
     resource_id: a.resource_id,
     day_of_week: a.day_of_week,
@@ -119,7 +149,7 @@ export default async function AnalyticsPage({
   const utilization = calculateUtilization(
     resources,
     availabilityRows,
-    bookings,
+    utilizationBookings,
     fromStr,
     toStr
   );
