@@ -1,5 +1,7 @@
 import { fakerEs } from '../lib/faker';
+import type { Sql } from '../lib/db';
 import type {
+  BookingOptions,
   SeededAddOn,
   SeededResource,
   SeededTenant,
@@ -221,3 +223,152 @@ export function pickAddOns(
 
 // Export types downstream callers need
 export type { BookingStatus, PaymentStatus, PaymentPlan, SlotCandidate, ExistingSlot };
+
+// ------------------------------------------------------------------
+// DB functions — dumb, predictable inserts.
+// ------------------------------------------------------------------
+
+interface BookingRowData {
+  resourceId: string;
+  locationId: string;
+  bookerId: string;
+  start: Date;
+  end: Date;
+  durationHours: number;
+  totalPrice: number;
+  status: BookingStatus;
+  notes: string | null;
+}
+
+async function insertBooking(sql: Sql, data: BookingRowData): Promise<string> {
+  const [row] = await sql<{ id: string }[]>`
+    insert into public.bookings (
+      resource_id, location_id, booker_id,
+      start_time, end_time, duration_hours,
+      total_price, status, notes
+    ) values (
+      ${data.resourceId}, ${data.locationId}, ${data.bookerId},
+      ${data.start.toISOString()}, ${data.end.toISOString()}, ${data.durationHours},
+      ${data.totalPrice}, ${data.status}, ${data.notes}
+    )
+    returning id
+  `;
+  return row.id;
+}
+
+async function insertBookingAddOns(
+  sql: Sql,
+  bookingId: string,
+  picks: Array<{ addOnId: string; price: number }>,
+): Promise<void> {
+  if (picks.length === 0) return;
+  const rows = picks.map((p) => ({
+    booking_id: bookingId,
+    add_on_service_id: p.addOnId,
+    price: p.price,
+  }));
+  await sql`insert into public.booking_add_ons ${sql(rows)}`;
+}
+
+async function insertPayments(
+  sql: Sql,
+  bookingId: string,
+  plan: PaymentPlan,
+): Promise<void> {
+  if (plan.entries.length === 0) return;
+  const rows = plan.entries.map((e) => ({
+    booking_id: bookingId,
+    amount: e.amount,
+    entry_type: e.entryType,
+    method: e.method,
+  }));
+  await sql`insert into public.booking_payments ${sql(rows)}`;
+}
+
+// ------------------------------------------------------------------
+// Orchestrator: seeds bookers, then a batch of bookings with realistic
+// status, payment, and add-on distributions. Collision detection is
+// in-memory.
+// ------------------------------------------------------------------
+
+/**
+ * Top-level booking generator. Creates ~target bookings across the
+ * tenant's resources over `windowDays`. Actual count may be lower if
+ * collisions exhaust our slot-picking attempts.
+ *
+ * `bookerIds` is passed in (not created here) so multiple tenants can
+ * share the same booker pool where that makes sense. For thin tenants
+ * the caller passes a small per-tenant pool.
+ */
+export async function seedBookingsForTenant(
+  sql: Sql,
+  tenant: SeededTenant,
+  bookerIds: string[],
+  opts: BookingOptions,
+): Promise<{ created: number; skipped: number }> {
+  if (bookerIds.length === 0) {
+    throw new Error(`[seed] no bookers supplied for tenant ${tenant.slug}`);
+  }
+  if (tenant.resources.length === 0) {
+    return { created: 0, skipped: 0 };
+  }
+
+  const now = new Date();
+  const existing: ExistingSlot[] = [];
+  let created = 0;
+  let skipped = 0;
+
+  // We attempt up to target * 2 picks so we don't give up too early
+  // when collisions happen on the hotter resources.
+  const maxAttempts = opts.target * 2;
+  for (let i = 0; i < maxAttempts && created < opts.target; i++) {
+    const slot = pickSlot(tenant, opts.windowDays, now, existing);
+    if (!slot) {
+      skipped++;
+      continue;
+    }
+
+    const resource = tenant.resources.find((r) => r.id === slot.resourceId);
+    if (!resource) {
+      skipped++;
+      continue;
+    }
+
+    const addOns = pickAddOns(resource, slot.durationHours);
+    const addOnTotal = addOns.reduce((sum, a) => sum + a.price, 0);
+    const totalPrice = resource.hourlyRate * slot.durationHours + addOnTotal;
+
+    const status = assignStatus(slot.start, now);
+    const paymentPlan = assignPaymentState(status, totalPrice, slot.start, now);
+
+    const bookerId = fakerEs.helpers.arrayElement(bookerIds);
+    const notes =
+      fakerEs.number.float({ min: 0, max: 1 }) < 0.15
+        ? fakerEs.lorem.sentence({ min: 4, max: 10 })
+        : null;
+
+    const bookingId = await insertBooking(sql, {
+      resourceId: slot.resourceId,
+      locationId: slot.locationId,
+      bookerId,
+      start: slot.start,
+      end: slot.end,
+      durationHours: slot.durationHours,
+      totalPrice,
+      status,
+      notes,
+    });
+
+    await insertBookingAddOns(sql, bookingId, addOns);
+    await insertPayments(sql, bookingId, paymentPlan);
+
+    existing.push({
+      resourceId: slot.resourceId,
+      start: slot.start.getTime(),
+      end: slot.end.getTime(),
+    });
+    created++;
+  }
+
+  return { created, skipped };
+}
