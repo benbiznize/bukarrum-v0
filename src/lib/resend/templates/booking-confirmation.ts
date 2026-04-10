@@ -13,6 +13,7 @@ interface BookingLineItem {
 }
 
 interface BookingEmailData {
+  bookingNumber: number;
   bookerName: string;
   tenantName: string;
   locationName: string;
@@ -32,6 +33,7 @@ export function bookingConfirmationContent(data: BookingEmailData): {
   const durationLabel = data.durationHours === 1 ? "hora" : "horas";
 
   const rows = [
+    detailRow("Reserva", `#${data.bookingNumber}`),
     detailRow("Local", data.locationName),
     detailRow("Recurso", data.resourceName),
     detailRow("Fecha", data.date),
@@ -64,6 +66,7 @@ export function bookingConfirmationContent(data: BookingEmailData): {
     "Tu reserva ha sido creada.",
     "",
     "Detalles:",
+    `  Reserva: #${data.bookingNumber}`,
     `  Local: ${data.locationName}`,
     `  Recurso: ${data.resourceName}`,
     `  Fecha: ${data.date}`,

@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUpRight } from "lucide-react";
 import { checkLocationLimit } from "@/lib/plans/check-limit";
 
 export default async function LocationsPage({
@@ -67,9 +67,18 @@ export default async function LocationsPage({
           )}
         </div>
         {atLimit ? (
-          <span className="text-sm text-muted-foreground border rounded-md px-4 py-2">
-            {c.limitReached}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">
+              {c.limitReached}
+            </span>
+            <Link
+              href={`/dashboard/${tenantSlug}/settings`}
+              className={buttonVariants()}
+            >
+              <ArrowUpRight className="mr-2 h-4 w-4" />
+              {d.upgradePlan}
+            </Link>
+          </div>
         ) : (
           <Link href={`/dashboard/${tenantSlug}/locations/new`} className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />

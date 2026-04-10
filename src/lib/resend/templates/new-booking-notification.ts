@@ -13,6 +13,7 @@ interface BookingLineItem {
 }
 
 interface BookingEmailData {
+  bookingNumber: number;
   bookerName: string;
   bookerEmail: string;
   locationName: string;
@@ -32,6 +33,7 @@ export function newBookingNotificationContent(data: BookingEmailData): {
   const durationLabel = data.durationHours === 1 ? "hora" : "horas";
 
   const rows = [
+    detailRow("Reserva", `#${data.bookingNumber}`),
     detailRow("Cliente", `${data.bookerName} (${data.bookerEmail})`),
     detailRow("Local", data.locationName),
     detailRow("Recurso", data.resourceName),
@@ -57,6 +59,7 @@ export function newBookingNotificationContent(data: BookingEmailData): {
   const text = [
     "Nueva reserva recibida:",
     "",
+    `  Reserva: #${data.bookingNumber}`,
     `  Cliente: ${data.bookerName} (${data.bookerEmail})`,
     `  Local: ${data.locationName}`,
     `  Recurso: ${data.resourceName}`,

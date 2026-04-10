@@ -31,6 +31,7 @@ export type BookingState = {
   availableUntil: string | null;
   durationHours: number | null;
   selectedAddOns: { id: string; name: string; price: number }[];
+  bookingNumber: number | null;
   error: string | null;
 };
 
@@ -43,7 +44,7 @@ type Action =
   | { type: "SELECT_ADD_ONS"; addOns: { id: string; name: string; price: number }[] }
   | { type: "GO_BACK" }
   | { type: "SET_ERROR"; error: string }
-  | { type: "BOOKING_COMPLETE" };
+  | { type: "BOOKING_COMPLETE"; bookingNumber: number };
 
 const STEP_ORDER: Step[] = ["location", "resource", "date", "time", "duration", "addons", "contact", "confirmation"];
 
@@ -112,7 +113,12 @@ function reducer(state: BookingState, action: Action): BookingState {
     case "SET_ERROR":
       return { ...state, error: action.error };
     case "BOOKING_COMPLETE":
-      return { ...state, step: "confirmation", error: null };
+      return {
+        ...state,
+        step: "confirmation",
+        bookingNumber: action.bookingNumber,
+        error: null,
+      };
     default:
       return state;
   }
@@ -159,6 +165,7 @@ export function BookingFlow({
     availableUntil: null,
     durationHours: null,
     selectedAddOns: [],
+    bookingNumber: null,
     error: null,
   });
 

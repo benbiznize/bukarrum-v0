@@ -17,8 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus } from "lucide-react";
-import { checkResourceLimit, getPlanFeatures } from "@/lib/plans/check-limit";
-import { AddOnManager } from "@/components/dashboard/add-on-manager";
+import { checkResourceLimit } from "@/lib/plans/check-limit";
 
 export default async function LocationDashboardPage({
   params,
@@ -70,17 +69,6 @@ export default async function LocationDashboardPage({
 
   const limitCheck = await checkResourceLimit(tenant.id, location.id);
   const atLimit = !limitCheck.allowed;
-
-  // Fetch add-on services for this location
-  const { data: addOns } = await supabase
-    .from("add_on_services")
-    .select("id, name, description, hourly_rate, is_active")
-    .eq("location_id", location.id)
-    .order("name");
-
-  // Check if add-ons feature is enabled in plan
-  const plan = await getPlanFeatures(tenant.id);
-  const addOnsEnabled = plan?.features.add_ons ?? false;
 
   const base = `/dashboard/${tenantSlug}/${locationSlug}`;
 
@@ -150,18 +138,12 @@ export default async function LocationDashboardPage({
                       {resource.is_active ? c.active : c.inactive}
                     </Badge>
                   </TableCell>
-                  <TableCell className="flex gap-1">
+                  <TableCell>
                     <Link
-                      href={`${base}/resources/${resource.id}/availability`}
+                      href={`${base}/resources/${resource.id}`}
                       className={buttonVariants({ variant: "ghost", size: "sm" })}
                     >
-                      {d.schedule}
-                    </Link>
-                    <Link
-                      href={`${base}/resources/${resource.id}/edit`}
-                      className={buttonVariants({ variant: "ghost", size: "sm" })}
-                    >
-                      {c.edit}
+                      {c.manage}
                     </Link>
                   </TableCell>
                 </TableRow>
@@ -180,16 +162,6 @@ export default async function LocationDashboardPage({
           </Link>
         </div>
       )}
-
-      <div className="mt-8">
-        <AddOnManager
-          addOns={addOns ?? []}
-          tenantSlug={tenantSlug}
-          locationSlug={locationSlug}
-          locationId={location.id}
-          enabled={addOnsEnabled}
-        />
-      </div>
     </div>
   );
 }

@@ -50,6 +50,7 @@ export interface BookingLineItem {
 }
 
 interface BookingEmailData {
+  bookingNumber: number;
   bookerName: string;
   bookerEmail: string;
   tenantName: string;

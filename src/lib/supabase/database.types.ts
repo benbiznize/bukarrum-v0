@@ -38,39 +38,42 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          hourly_rate: number
           id: string
           is_active: boolean
-          location_id: string
           name: string
+          pricing_mode: Database["public"]["Enums"]["add_on_pricing_mode"]
+          resource_id: string
+          unit_price: number
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
-          hourly_rate: number
           id?: string
           is_active?: boolean
-          location_id: string
           name: string
+          pricing_mode?: Database["public"]["Enums"]["add_on_pricing_mode"]
+          resource_id: string
+          unit_price: number
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
-          hourly_rate?: number
           id?: string
           is_active?: boolean
-          location_id?: string
           name?: string
+          pricing_mode?: Database["public"]["Enums"]["add_on_pricing_mode"]
+          resource_id?: string
+          unit_price?: number
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "add_on_services_location_id_fkey"
-            columns: ["location_id"]
+            foreignKeyName: "add_on_services_resource_id_fkey"
+            columns: ["resource_id"]
             isOneToOne: false
-            referencedRelation: "locations"
+            referencedRelation: "resources"
             referencedColumns: ["id"]
           },
         ]
@@ -176,6 +179,32 @@ export type Database = {
           },
         ]
       }
+      booking_number_counters: {
+        Row: {
+          last_number: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          last_number: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          last_number?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_number_counters_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_payments: {
         Row: {
           amount: number
@@ -226,6 +255,7 @@ export type Database = {
       bookings: {
         Row: {
           booker_id: string
+          booking_number: number
           created_at: string
           duration_hours: number
           end_time: string
@@ -242,6 +272,7 @@ export type Database = {
         }
         Insert: {
           booker_id: string
+          booking_number: number
           created_at?: string
           duration_hours: number
           end_time: string
@@ -258,6 +289,7 @@ export type Database = {
         }
         Update: {
           booker_id?: string
+          booking_number?: number
           created_at?: string
           duration_hours?: number
           end_time?: string
@@ -563,6 +595,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allocate_booking_number: {
+        Args: { p_tenant_id: string }
+        Returns: number
+      }
       create_booking_if_available: {
         Args: {
           p_add_on_ids?: string[]
@@ -589,6 +625,7 @@ export type Database = {
       }
     }
     Enums: {
+      add_on_pricing_mode: "hourly" | "flat"
       booking_payment_status: "unpaid" | "partial" | "paid" | "refunded"
       booking_status:
         | "pending"
@@ -738,6 +775,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      add_on_pricing_mode: ["hourly", "flat"],
       booking_payment_status: ["unpaid", "partial", "paid", "refunded"],
       booking_status: [
         "pending",

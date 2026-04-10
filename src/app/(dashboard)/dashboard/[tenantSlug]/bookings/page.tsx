@@ -56,6 +56,7 @@ export default async function BookingsPage({
     .select(
       `
       id,
+      booking_number,
       start_time,
       end_time,
       duration_hours,
@@ -127,6 +128,7 @@ export default async function BookingsPage({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[80px]">#</TableHead>
                 <TableHead>{d.dateTime}</TableHead>
                 <TableHead>{d.resources}</TableHead>
                 <TableHead>{d.locations}</TableHead>
@@ -161,6 +163,11 @@ export default async function BookingsPage({
                 const detailHref = `/dashboard/${tenantSlug}/bookings/${booking.id}`;
                 return (
                   <TableRow key={booking.id}>
+                    <TableCell className="font-mono tabular-nums text-muted-foreground">
+                      <Link href={detailHref} className="hover:underline">
+                        #{booking.booking_number}
+                      </Link>
+                    </TableCell>
                     <TableCell className="whitespace-nowrap">
                       <Link
                         href={detailHref}

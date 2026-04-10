@@ -8,6 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -26,14 +33,17 @@ import {
   createAddOn,
   updateAddOn,
   deleteAddOn,
-} from "@/app/(dashboard)/dashboard/[tenantSlug]/[locationSlug]/add-ons/actions";
+} from "@/app/(dashboard)/dashboard/[tenantSlug]/[locationSlug]/resources/[resourceId]/actions";
 import { useDict } from "@/lib/i18n/dict-context";
+
+type PricingMode = "hourly" | "flat";
 
 type AddOn = {
   id: string;
   name: string;
   description: string | null;
-  hourly_rate: number;
+  unit_price: number;
+  pricing_mode: PricingMode;
   is_active: boolean;
 };
 
@@ -47,13 +57,13 @@ export function AddOnManager({
   addOns,
   tenantSlug,
   locationSlug,
-  locationId,
+  resourceId,
   enabled,
 }: {
   addOns: AddOn[];
   tenantSlug: string;
   locationSlug: string;
-  locationId: string;
+  resourceId: string;
   enabled: boolean;
 }) {
   const { dashboard, common } = useDict();
@@ -61,6 +71,9 @@ export function AddOnManager({
   const [editing, setEditing] = useState<AddOn | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Local state so the unit label (per-hour vs flat) tracks the user's
+  // current mode selection before they submit.
+  const [mode, setMode] = useState<PricingMode>("hourly");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,8 +82,8 @@ export function AddOnManager({
 
     const formData = new FormData(e.currentTarget);
     const result = editing
-      ? await updateAddOn(tenantSlug, locationSlug, editing.id, formData)
-      : await createAddOn(tenantSlug, locationSlug, locationId, formData);
+      ? await updateAddOn(tenantSlug, locationSlug, resourceId, editing.id, formData)
+      : await createAddOn(tenantSlug, locationSlug, resourceId, formData);
 
     setLoading(false);
     if (result.error) {
@@ -83,19 +96,28 @@ export function AddOnManager({
 
   async function handleDelete(id: string) {
     if (!confirm(dashboard.addOns.deleteConfirm)) return;
-    await deleteAddOn(tenantSlug, locationSlug, id);
+    await deleteAddOn(tenantSlug, locationSlug, resourceId, id);
   }
 
   function openCreate() {
     setEditing(null);
+    setMode("hourly");
     setError(null);
     setOpen(true);
   }
 
   function openEdit(addOn: AddOn) {
     setEditing(addOn);
+    setMode(addOn.pricing_mode);
     setError(null);
     setOpen(true);
+  }
+
+  function formatPrice(a: AddOn) {
+    const base = fmt.format(a.unit_price);
+    return a.pricing_mode === "hourly"
+      ? `${base}${dashboard.addOns.perHourSuffix}`
+      : `${base} · ${dashboard.addOns.flatSuffix}`;
   }
 
   if (!enabled) {
@@ -145,16 +167,49 @@ export function AddOnManager({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="addon-rate">{dashboard.addOns.rateCLP}</Label>
+                <Label htmlFor="addon-mode">{dashboard.addOns.pricingMode}</Label>
+                <Select
+                  name="pricing_mode"
+                  value={mode}
+                  onValueChange={(v) => setMode(v as PricingMode)}
+                >
+                  <SelectTrigger id="addon-mode">
+                    <SelectValue>
+                      {(value: string) =>
+                        value === "flat"
+                          ? dashboard.addOns.modeFlat
+                          : dashboard.addOns.modeHourly
+                      }
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hourly">
+                      {dashboard.addOns.modeHourly}
+                    </SelectItem>
+                    <SelectItem value="flat">
+                      {dashboard.addOns.modeFlat}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="addon-price">
+                  {dashboard.addOns.unitPriceCLP}
+                </Label>
                 <Input
-                  id="addon-rate"
-                  name="hourly_rate"
+                  id="addon-price"
+                  name="unit_price"
                   type="number"
                   min="0"
-                  step="1000"
-                  defaultValue={editing?.hourly_rate ?? ""}
+                  step="500"
+                  defaultValue={editing?.unit_price ?? ""}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  {mode === "hourly"
+                    ? dashboard.addOns.unitPriceHintHourly
+                    : dashboard.addOns.unitPriceHintFlat}
+                </p>
               </div>
               {editing && (
                 <div className="flex items-center gap-3">
@@ -181,7 +236,7 @@ export function AddOnManager({
             <TableHeader>
               <TableRow>
                 <TableHead>{common.name}</TableHead>
-                <TableHead>{dashboard.addOns.ratePerHour}</TableHead>
+                <TableHead>{dashboard.addOns.price}</TableHead>
                 <TableHead>{common.status}</TableHead>
                 <TableHead className="w-[80px]" />
               </TableRow>
@@ -199,7 +254,9 @@ export function AddOnManager({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>{fmt.format(a.hourly_rate)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {formatPrice(a)}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={a.is_active ? "default" : "secondary"}>
                       {a.is_active ? common.active : common.inactive}
