@@ -1,4 +1,4 @@
-import { Faker, es } from '@faker-js/faker';
+import { Faker, es, en, base } from '@faker-js/faker';
 
 /**
  * Deterministic faker for seed data.
@@ -10,7 +10,10 @@ import { Faker, es } from '@faker-js/faker';
 const seedEnv = process.env.FAKER_SEED;
 const SEED = seedEnv ? Number.parseInt(seedEnv, 10) : 42;
 
-export const fakerEs = new Faker({ locale: [es] });
+// Locale fallback chain: es-first, falling through to en, then base.
+// Required because faker's `es` locale lacks some modules (notably
+// `lorem`), and the loader throws instead of silently falling back.
+export const fakerEs = new Faker({ locale: [es, en, base] });
 fakerEs.seed(Number.isFinite(SEED) ? SEED : 42);
 
 /**

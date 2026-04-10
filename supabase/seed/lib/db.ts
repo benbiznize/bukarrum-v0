@@ -44,4 +44,11 @@ export function createSqlClient() {
   });
 }
 
-export type Sql = ReturnType<typeof createSqlClient>;
+/**
+ * Accepted by every generator: the base callable/tagged-template
+ * interface that both a top-level client and a `sql.begin()` tx
+ * implement. This lets generators run transparently inside a
+ * transaction without fighting the `TransactionSql` vs `Sql` split
+ * in the `postgres` types.
+ */
+export type Sql = postgres.TransactionSql<Record<string, unknown>>;
