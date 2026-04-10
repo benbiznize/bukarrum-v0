@@ -42,7 +42,14 @@ export function CalendarFilters({
         }
       >
         <SelectTrigger className="w-[180px]">
-          <SelectValue />
+          <SelectValue>
+            {(value: string) =>
+              value === "all"
+                ? calendarView.allLocations
+                : locations.find((l) => l.id === value)?.name ??
+                  calendarView.allLocations
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{calendarView.allLocations}</SelectItem>
@@ -61,7 +68,14 @@ export function CalendarFilters({
         }
       >
         <SelectTrigger className="w-[180px]">
-          <SelectValue />
+          <SelectValue>
+            {(value: string) =>
+              value === "all"
+                ? calendarView.allResources
+                : resources.find((r) => r.id === value)?.name ??
+                  calendarView.allResources
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{calendarView.allResources}</SelectItem>

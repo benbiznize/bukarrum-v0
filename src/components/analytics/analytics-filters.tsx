@@ -159,7 +159,13 @@ export function AnalyticsFilters({
         onValueChange={handleLocationChange}
       >
         <SelectTrigger size="sm">
-          <SelectValue />
+          <SelectValue>
+            {(value: string) =>
+              value === "__all__"
+                ? cv.allLocations
+                : locations.find((l) => l.id === value)?.name ?? cv.allLocations
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">{cv.allLocations}</SelectItem>
@@ -176,7 +182,13 @@ export function AnalyticsFilters({
         onValueChange={handleResourceChange}
       >
         <SelectTrigger size="sm">
-          <SelectValue />
+          <SelectValue>
+            {(value: string) =>
+              value === "__all__"
+                ? cv.allResources
+                : resources.find((r) => r.id === value)?.name ?? cv.allResources
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">{cv.allResources}</SelectItem>
