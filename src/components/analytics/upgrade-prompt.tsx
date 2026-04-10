@@ -29,7 +29,10 @@ export function UpgradePrompt({
           </div>
           <h2 className="text-xl font-bold">{d.upgradeTitle}</h2>
           <p className="text-muted-foreground">{d.upgradeDesc}</p>
-          <Button render={<Link href={`/dashboard/${tenantSlug}/settings`} />}>
+          <Button
+            nativeButton={false}
+            render={<Link href={`/dashboard/${tenantSlug}/settings`} />}
+          >
             {d.upgradeButton}
           </Button>
         </CardContent>

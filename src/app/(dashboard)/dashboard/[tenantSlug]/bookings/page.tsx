@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BookingStatusActions } from "@/components/dashboard/booking-status-actions";
+import { PaymentStatusBadge } from "@/components/dashboard/payment-status-badge";
 
 // STATUS_LABELS loaded from dictionary in component below
 
@@ -58,6 +60,8 @@ export default async function BookingsPage({
       end_time,
       duration_hours,
       total_price,
+      paid_amount,
+      payment_status,
       status,
       notes,
       created_at,
@@ -103,6 +107,7 @@ export default async function BookingsPage({
   const dict = await getDictionary(locale);
   const d = dict.dashboard;
   const statusLabels = d.statusLabels as Record<string, string>;
+  const paymentLabels = d.paymentLabels as Record<string, string>;
 
   return (
     <div className="p-6">
@@ -122,6 +127,7 @@ export default async function BookingsPage({
                 <TableHead>{dict.booking.duration}</TableHead>
                 <TableHead>{dict.common.total}</TableHead>
                 <TableHead>{dict.common.status}</TableHead>
+                <TableHead>{d.paymentStatus}</TableHead>
                 <TableHead className="w-[50px]" />
               </TableRow>
             </TableHeader>
@@ -143,13 +149,21 @@ export default async function BookingsPage({
                   phone: string | null;
                 };
 
+                const detailHref = `/dashboard/${tenantSlug}/bookings/${booking.id}`;
                 return (
                   <TableRow key={booking.id}>
                     <TableCell className="whitespace-nowrap">
-                      {formatDateTime(booking.start_time)}
+                      <Link
+                        href={detailHref}
+                        className="hover:underline"
+                      >
+                        {formatDateTime(booking.start_time)}
+                      </Link>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {resource.name}
+                      <Link href={detailHref} className="hover:underline">
+                        {resource.name}
+                      </Link>
                     </TableCell>
                     <TableCell>{location?.name ?? "—"}</TableCell>
                     <TableCell>
@@ -164,6 +178,15 @@ export default async function BookingsPage({
                       <Badge variant={STATUS_VARIANT[booking.status] ?? "outline"}>
                         {statusLabels[booking.status] ?? booking.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <PaymentStatusBadge
+                        status={booking.payment_status}
+                        label={
+                          paymentLabels[booking.payment_status] ??
+                          booking.payment_status
+                        }
+                      />
                     </TableCell>
                     <TableCell>
                       <BookingStatusActions

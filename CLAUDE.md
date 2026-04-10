@@ -17,7 +17,7 @@ Two user types:
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript (strict mode)
 - **Database / Auth / Storage**: Supabase (PostgreSQL with RLS, Supabase Auth with Google sign-in, Supabase Storage)
-- **UI**: shadcn/ui + Tailwind CSS + Radix UI
+- **UI**: shadcn/ui + Tailwind CSS + Radix UI + Base UI (`@base-ui/react`)
 - **Payments**: MercadoPago (tenant subscription billing)
 - **Email**: Resend (transactional emails)
 - **Hosting**: Vercel (with native GitHub, Supabase, and Resend integrations via Vercel Marketplace)
@@ -30,6 +30,8 @@ npm run dev                # Start Next.js dev server
 npm run build              # Production build
 npm run lint               # ESLint
 npm run type-check         # TypeScript type checking
+npm run test:e2e           # Playwright e2e tests (tests/ at repo root)
+npm run test:e2e:ui        # Playwright interactive UI mode
 npx supabase start         # Start local Supabase (Docker required)
 npx supabase db reset      # Reset local DB with migrations
 npx supabase db seed       # Seed local DB with test data
@@ -55,11 +57,11 @@ src/
 │   ├── ui/                       # shadcn/ui components
 │   └── ...                       # Feature components
 ├── lib/
-│   ├── supabase/                 # Client, server, proxy helpers + generated types
+│   ├── supabase/                 # Four client variants (see below) + generated types
 │   ├── mercadopago/              # Payment SDK helpers
 │   ├── resend/                   # Email templates and helpers
 │   └── types/                    # Shared TypeScript types (e.g., plan-features.ts)
-├── actions/                      # Server Actions (mutations)
+├── proxy.ts                      # Next.js 16 proxy (replaces middleware.ts)
 └── hooks/                        # Client-side React hooks
 ```
 
@@ -70,14 +72,31 @@ src/
 - RLS policies enforce tenant isolation at the database level
 - Supabase Auth handles both tenant users and booker sessions
 - URL structure: `/dashboard/[tenantSlug]/[locationSlug]` for admin; `/[tenantSlug]` for public booking
-- Proxy (Next.js 16 `proxy.ts`) protects `(dashboard)` routes — redirects unauthenticated users
+- Proxy at `src/proxy.ts` (Next.js 16 replaces `middleware.ts`) — handles auth gates, onboarding funnel redirects, and locale detection (cookie → `Accept-Language` → `es`)
 
 ### Data Patterns
 
 - **Reads**: Server Components fetch directly from Supabase (no API layer needed)
-- **Mutations**: Server Actions in `src/actions/`
+- **Mutations**: Server Actions **colocated** as `actions.ts` next to each route (e.g., `src/app/(dashboard)/dashboard/[tenantSlug]/bookings/actions.ts`). There is no central `src/actions/` directory.
 - **Webhooks**: Route Handlers in `src/app/api/`
 - **Client interactivity**: Pass data from Server Components to Client Components as serializable props (never pass Date objects, functions, or class instances across the boundary)
+
+### Supabase Client Variants
+
+Four clients in `src/lib/supabase/`, each for a specific context. Pick the right one:
+
+| File | Use in | Auth | Notes |
+|------|--------|------|-------|
+| `client.ts` | Client Components | User session via browser cookies | `createBrowserClient` |
+| `server.ts` | Server Components & Server Actions | User session via `next/headers` cookies | **Cannot** be used inside `"use cache"` |
+| `public.ts` | `"use cache"` / `unstable_cache` functions | Anonymous (RLS public policies) | Cookie-less; required because `next/headers` is unavailable in cached reads |
+| `service.ts` | Webhooks, background jobs, admin tasks | `SUPABASE_SERVICE_ROLE_KEY` — **bypasses RLS** | Never import into client code |
+
+### Caching & Concurrency
+
+- **Public booking page reads** use `unstable_cache` + per-tenant `revalidateTag("tenant:<id>")` (see `src/lib/booking/queries.ts`). Cached functions must use `createPublicClient` — not `server.ts` — because `next/headers` is unavailable inside `"use cache"`.
+- **Booking mutations** go through Postgres RPCs (`supabase.rpc("book_resource", ...)` etc.) for atomic conflict prevention and server-side price validation. Don't reimplement booking logic in app code — extend the RPC in a migration instead.
+- **Rate limiting** via Upstash Redis (`src/lib/rate-limit.ts`). Gracefully no-ops when `UPSTASH_REDIS_REST_*` env vars are missing, so local dev works without setup. Currently covers booking creation and contact form.
 
 ## Domain Model
 
@@ -136,3 +155,4 @@ A typed interface in `src/lib/types/plan-features.ts` defines the JSONB shape fo
 - All Supabase queries use the typed client from `src/lib/supabase/`
 - Spanish UI strings managed via i18n dictionaries — never hardcode user-facing strings
 - Environment variables: `.env.local` for local dev, `vercel env` for production
+- **Base UI gotchas**: `<SelectValue />` renders the raw `value` by default — always pass a children render function to display the label. `<Button render={<Link/>}>` requires `nativeButton={false}` to avoid nested-button warnings.

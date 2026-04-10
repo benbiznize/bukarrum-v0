@@ -176,6 +176,53 @@ export type Database = {
           },
         ]
       }
+      booking_payments: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          entry_type: Database["public"]["Enums"]["payment_entry_type"]
+          id: string
+          method: Database["public"]["Enums"]["payment_method"]
+          notes: string | null
+          paid_at: string
+          recorded_by: string | null
+          reference: string | null
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          created_at?: string
+          entry_type?: Database["public"]["Enums"]["payment_entry_type"]
+          id?: string
+          method: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          paid_at?: string
+          recorded_by?: string | null
+          reference?: string | null
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          entry_type?: Database["public"]["Enums"]["payment_entry_type"]
+          id?: string
+          method?: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          paid_at?: string
+          recorded_by?: string | null
+          reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booker_id: string
@@ -185,6 +232,8 @@ export type Database = {
           id: string
           location_id: string | null
           notes: string | null
+          paid_amount: number
+          payment_status: Database["public"]["Enums"]["booking_payment_status"]
           resource_id: string
           start_time: string
           status: Database["public"]["Enums"]["booking_status"]
@@ -199,6 +248,8 @@ export type Database = {
           id?: string
           location_id?: string | null
           notes?: string | null
+          paid_amount?: number
+          payment_status?: Database["public"]["Enums"]["booking_payment_status"]
           resource_id: string
           start_time: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -213,6 +264,8 @@ export type Database = {
           id?: string
           location_id?: string | null
           notes?: string | null
+          paid_amount?: number
+          payment_status?: Database["public"]["Enums"]["booking_payment_status"]
           resource_id?: string
           start_time?: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -536,6 +589,7 @@ export type Database = {
       }
     }
     Enums: {
+      booking_payment_status: "unpaid" | "partial" | "paid" | "refunded"
       booking_status:
         | "pending"
         | "confirmed"
@@ -550,6 +604,8 @@ export type Database = {
         | "friday"
         | "saturday"
         | "sunday"
+      payment_entry_type: "payment" | "refund"
+      payment_method: "cash" | "transfer" | "card" | "mercadopago" | "other"
       resource_type: "room" | "equipment"
       subscription_status: "active" | "past_due" | "cancelled" | "trialing"
     }
@@ -682,6 +738,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      booking_payment_status: ["unpaid", "partial", "paid", "refunded"],
       booking_status: [
         "pending",
         "confirmed",
@@ -698,6 +755,8 @@ export const Constants = {
         "saturday",
         "sunday",
       ],
+      payment_entry_type: ["payment", "refund"],
+      payment_method: ["cash", "transfer", "card", "mercadopago", "other"],
       resource_type: ["room", "equipment"],
       subscription_status: ["active", "past_due", "cancelled", "trialing"],
     },
