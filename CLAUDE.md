@@ -33,8 +33,8 @@ npm run type-check         # TypeScript type checking
 npm run test:e2e           # Playwright e2e tests (tests/ at repo root)
 npm run test:e2e:ui        # Playwright interactive UI mode
 npx supabase start         # Start local Supabase (Docker required)
-npx supabase db reset      # Reset local DB with migrations
-npx supabase db seed       # Seed local DB with test data
+npm run db:reset           # Reset + seed with faker (canonical dev reset)
+npm run db:seed            # Seed only (assumes empty DB; prefer db:reset)
 npx supabase gen types typescript --local > src/lib/supabase/database.types.ts  # Regenerate DB types
 ```
 
