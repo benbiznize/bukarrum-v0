@@ -156,3 +156,91 @@ A typed interface in `src/lib/types/plan-features.ts` defines the JSONB shape fo
 - Spanish UI strings managed via i18n dictionaries — never hardcode user-facing strings
 - Environment variables: `.env.local` for local dev, `vercel env` for production
 - **Base UI gotchas**: `<SelectValue />` renders the raw `value` by default — always pass a children render function to display the label. `<Button render={<Link/>}>` requires `nativeButton={false}` to avoid nested-button warnings.
+
+## Git Workflow
+
+**Claude Code must follow these rules before making any change to the codebase. No edits on `main`, ever.**
+
+### Before any change
+
+Before modifying tracked files, create a new branch from an up-to-date `main`:
+
+```bash
+git checkout main
+git fetch origin
+git reset --hard origin/main   # local main tracks origin exactly
+git checkout -b <type>/<short-kebab-description>
+```
+
+Do the work on the branch, test it, commit, push. PR creation and merge are explicit follow-up steps — don't auto-open PRs or merge without being asked.
+
+### Branch naming
+
+`<type>/<short-kebab-description>` — lowercase, kebab-case, ≤50 chars total. Types:
+
+- `feature/` — new user-visible capability (`feature/booking-numbers`)
+- `fix/` — bug fix (`fix/calendar-timezone-drift`)
+- `chore/` — tooling, deps, config, refactors with no behavior change (`chore/bump-next-16`)
+- `docs/` — documentation only (`docs/git-workflow-conventions`)
+- `hotfix/` — urgent production fix
+
+### Commits
+
+- **Imperative mood, sentence case, no trailing period.** Match the dominant style in `git log --oneline`:
+  *"Track booking payments and auto-confirm when fully paid"* — not *"added payment tracking."* or *"feat: track payments"*.
+- **Small, focused commits.** One logical change per commit. Never bundle unrelated work.
+- **Never `git add -A` or `git add .`**. Stage specific paths to avoid sweeping in unrelated dirty files, screenshots, or secrets.
+- **Never `--amend` a commit that has already been pushed** — create a new commit instead.
+- **Never `--no-verify`**. If a pre-commit hook fails, fix the root cause.
+
+### Required checks before commit
+
+Every commit must pass at minimum:
+
+```bash
+npm run type-check      # TypeScript must compile cleanly
+npm run lint            # ESLint errors block; warnings allowed
+```
+
+Changes that touch migrations, RPCs, booking logic, or the seed must additionally pass:
+
+```bash
+npm run db:reset        # Migrations apply + seed completes
+```
+
+UI changes require a manual walk-through of the affected flow before push.
+
+### Push
+
+After tests pass and the commit lands:
+
+```bash
+git push -u origin <branch-name>
+```
+
+Stop here unless explicitly asked to open a PR or merge.
+
+### Pull requests (on request)
+
+- `gh pr create --base main --title "<imperative sentence>" --body "<summary + test plan>"`
+- PR title: same style as commits, ≤70 chars.
+- PR body: `## Summary` (what + why) and `## Test Plan` (what was verified).
+- Wait for Supabase Preview + Vercel checks to go green before merging.
+
+### Merge strategy (on request)
+
+- **Default: `gh pr merge <n> --rebase`** — preserves individual commits, keeps `main` linear. `main` has a linear history and should stay that way.
+- **Use `--squash`** only for WIP / experimental branches that shouldn't pollute main's history.
+- **Avoid `--merge`** (explicit merge commit) — breaks the linear history convention.
+
+### After a rebase-merge
+
+`--rebase` rewrites commit SHAs on the remote. Sync local `main`:
+
+```bash
+git checkout main
+git fetch origin
+git reset --hard origin/main   # safe: your local commits were replayed as new SHAs
+```
+
+Verify content parity with `git diff <old-sha>..<new-sha>` (should be empty) before the reset if you want to be defensive.
