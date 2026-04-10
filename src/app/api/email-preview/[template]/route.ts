@@ -6,6 +6,7 @@ import { bookingStatusChangeContent } from "@/lib/resend/templates/booking-statu
 import { contactFormContent } from "@/lib/resend/templates/contact-form";
 
 const MOCK_BOOKING = {
+  bookingNumber: 1042,
   bookerName: "Camila Rojas",
   bookerEmail: "camila@example.com",
   tenantName: "Estudio Sónico",

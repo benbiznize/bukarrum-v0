@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   MapPin,
-  Box,
   CalendarDays,
   CalendarRange,
   BarChart3,
@@ -82,20 +81,17 @@ export function DashboardSidebar({
             label={dashboard.analytics}
             active={pathname.startsWith(`${base}/analytics`)}
           />
-          <SidebarLink
-            href={`${base}/locations`}
-            icon={Box}
-            label={dashboard.resources}
-            active={pathname.startsWith(`${base}/locations`)}
-          />
         </div>
 
         {/* Locations */}
         <div className="mt-6">
           <div className="flex items-center justify-between px-3 mb-2">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <Link
+              href={`${base}/locations`}
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
+            >
               {dashboard.locations}
-            </span>
+            </Link>
             <Link
               href={`${base}/locations/new`}
               className="text-muted-foreground hover:text-foreground"

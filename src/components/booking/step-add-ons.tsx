@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Check } from "lucide-react";
-import { getAddOnsForLocation } from "@/app/(booking)/[tenantSlug]/actions";
+import { getAddOnsForResource } from "@/app/(booking)/[tenantSlug]/actions";
 import type { BookingState } from "./booking-flow";
 import { useDict } from "@/lib/i18n/dict-context";
+
+type PricingMode = "hourly" | "flat";
 
 type AddOn = {
   id: string;
   name: string;
   description: string | null;
-  hourly_rate: number;
+  unit_price: number;
+  pricing_mode: PricingMode;
 };
 
 const fmt = new Intl.NumberFormat("es-CL", {
@@ -21,6 +24,18 @@ const fmt = new Intl.NumberFormat("es-CL", {
   currency: "CLP",
   minimumFractionDigits: 0,
 });
+
+/**
+ * Compute the line total for an add-on given a booking duration.
+ * Must mirror the server-side CASE in `create_booking_if_available`:
+ *   hourly -> unit_price * duration
+ *   flat   -> unit_price
+ */
+function lineTotal(addOn: AddOn, durationHours: number): number {
+  return addOn.pricing_mode === "hourly"
+    ? addOn.unit_price * durationHours
+    : addOn.unit_price;
+}
 
 export function StepAddOns({
   state,
@@ -38,12 +53,12 @@ export function StepAddOns({
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!state.locationId) return;
-    getAddOnsForLocation(state.locationId).then((data) => {
+    if (!state.resourceId) return;
+    getAddOnsForResource(state.resourceId).then((data) => {
       setAddOns(data);
       setLoading(false);
     });
-  }, [state.locationId]);
+  }, [state.resourceId]);
 
   // Auto-skip if no add-ons available (must be in useEffect to avoid dispatch-during-render)
   useEffect(() => {
@@ -61,13 +76,15 @@ export function StepAddOns({
     });
   }
 
+  const durationHours = state.durationHours ?? 1;
+
   function handleContinue() {
     const selectedAddOns = addOns
       .filter((a) => selected.has(a.id))
       .map((a) => ({
         id: a.id,
         name: a.name,
-        price: a.hourly_rate * (state.durationHours ?? 1),
+        price: lineTotal(a, durationHours),
       }));
     dispatch({ type: "SELECT_ADD_ONS", addOns: selectedAddOns });
   }
@@ -84,8 +101,6 @@ export function StepAddOns({
 
   if (addOns.length === 0) return null;
 
-  const durationHours = state.durationHours ?? 1;
-
   return (
     <div>
       <h2 className="text-lg font-semibold mb-1">{booking.addOnsTitle}</h2>
@@ -94,7 +109,11 @@ export function StepAddOns({
       <div className="grid gap-3 mb-6">
         {addOns.map((a) => {
           const isSelected = selected.has(a.id);
-          const totalPrice = a.hourly_rate * durationHours;
+          const total = lineTotal(a, durationHours);
+          const breakdown =
+            a.pricing_mode === "hourly"
+              ? `${fmt.format(a.unit_price)}/h × ${durationHours}h`
+              : booking.flatFee;
           return (
             <Card
               key={a.id}
@@ -122,10 +141,8 @@ export function StepAddOns({
                   </div>
                 </div>
                 <div className="text-right shrink-0 ml-4">
-                  <p className="text-sm font-medium">{fmt.format(totalPrice)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {fmt.format(a.hourly_rate)}/h × {durationHours}h
-                  </p>
+                  <p className="text-sm font-medium">{fmt.format(total)}</p>
+                  <p className="text-xs text-muted-foreground">{breakdown}</p>
                 </div>
               </CardContent>
             </Card>

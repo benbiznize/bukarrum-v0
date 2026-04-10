@@ -31,7 +31,8 @@
     "perMonth": "/mo",
     "perHour": "/hr",
     "hourlyRateCLP": "Hourly rate (CLP)",
-    "total": "Total"
+    "total": "Total",
+    "manage": "Manage"
   },
   "auth": {
     "signIn": "Sign in",
@@ -154,6 +155,7 @@
     "addOnsSubtitle": "Optional — select the ones you want",
     "continueWithSelection": "Continue with selection",
     "continueWithout": "Continue without add-ons",
+    "flatFee": "Flat fee",
     "stepLabels": ["Location", "Resource", "Date", "Time", "Duration", "Extras", "Confirm"],
     "errors": {
       "MISSING_FIELDS": "Missing required fields",
@@ -187,6 +189,11 @@
     "noLocationsEmpty": "You don't have any locations yet",
     "noResourcesEmpty": "This location has no resources yet",
     "schedule": "Schedule",
+    "upgradePlan": "Upgrade plan",
+    "resourceInfo": "Resource info",
+    "assignedLocations": "Assigned locations",
+    "noAssignedLocations": "This resource is not assigned to any location",
+    "recentBookings": "Recent bookings",
     "statusLabels": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -286,18 +293,26 @@
       "errorOverRefund": "Refund exceeds amount paid",
       "errorInvalidAmount": "Enter a valid amount greater than zero",
       "errorMaxLabel": "Max allowed",
-      "errorGeneric": "Could not record the payment. Please try again."
+      "errorGeneric": "Could not record the payment. Please try again.",
+      "flatFee": "Flat fee"
     },
     "addOns": {
       "title": "Add-on services",
       "add": "Add",
       "editService": "Edit service",
       "newService": "New add-on service",
-      "rateCLP": "Hourly rate (CLP)",
+      "pricingMode": "Pricing mode",
+      "modeHourly": "Per hour",
+      "modeFlat": "Flat fee",
+      "unitPriceCLP": "Price (CLP)",
+      "unitPriceHintHourly": "Multiplied by the booking duration.",
+      "unitPriceHintFlat": "Single fee, independent of duration.",
+      "price": "Price",
+      "perHourSuffix": "/h",
+      "flatSuffix": "flat",
       "deleteConfirm": "Delete this add-on service?",
       "proRequired": "Add-on services are available on the Pro plan or higher.",
-      "emptyHint": "Add services like sound engineers, photographers, etc.",
-      "ratePerHour": "Rate/hr"
+      "emptyHint": "Add services like recording, equipment rental, sound engineers, etc."
     },
     "namePlaceholder": "E.g.: Downtown Studio",
     "addressPlaceholder": "E.g.: 123 Main Street",

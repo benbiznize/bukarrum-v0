@@ -32,6 +32,11 @@ export function StepConfirmation({ state }: { state: BookingState }) {
         <CheckCircle2 className="h-16 w-16 text-green-500" />
       </div>
       <h2 className="text-xl font-bold mb-1">{booking.success}</h2>
+      {state.bookingNumber !== null && (
+        <p className="font-mono tabular-nums text-2xl font-bold mt-2 mb-1">
+          #{state.bookingNumber}
+        </p>
+      )}
       <p className="text-muted-foreground mb-6">
         {booking.successMessage}
       </p>

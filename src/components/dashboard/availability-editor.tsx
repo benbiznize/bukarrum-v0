@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDict } from "@/lib/i18n/dict-context";
 
 type DayOfWeek =
@@ -61,59 +60,52 @@ export function AvailabilityEditor({
   const [state, formAction, isPending] = useActionState(action, { error: "", success: false });
 
   return (
-    <Card className="max-w-lg">
-      <CardHeader>
-        <CardTitle>{dashboard.weeklySchedule}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form action={formAction} className="grid gap-4">
-          {DAYS.map((day) => {
-            const slot = slotsByDay.get(day);
-            return (
-              <div key={day} className="flex items-center gap-4">
-                <div className="flex items-center gap-2 w-32">
-                  <Switch
-                    id={`enabled_${day}`}
-                    name={`enabled_${day}`}
-                    checked={enabled[day]}
-                    onCheckedChange={(val) =>
-                      setEnabled((prev) => ({ ...prev, [day]: val }))
-                    }
-                  />
-                  <Label htmlFor={`enabled_${day}`} className="text-sm">
-                    {dashboard.dayLabels[day]}
-                  </Label>
-                </div>
-                <Input
-                  type="time"
-                  name={`start_${day}`}
-                  defaultValue={slot?.start_time?.slice(0, 5) ?? "09:00"}
-                  className="w-28"
-                />
-                <span className="text-muted-foreground text-sm">{dashboard.to}</span>
-                <Input
-                  type="time"
-                  name={`end_${day}`}
-                  defaultValue={slot?.end_time?.slice(0, 5) ?? "21:00"}
-                  className="w-28"
-                />
-              </div>
-            );
-          })}
+    <form action={formAction} className="grid gap-4">
+      {DAYS.map((day) => {
+        const slot = slotsByDay.get(day);
+        return (
+          <div key={day} className="flex items-center gap-4">
+            <div className="flex items-center gap-2 w-32">
+              <Switch
+                id={`enabled_${day}`}
+                name={`enabled_${day}`}
+                checked={enabled[day]}
+                onCheckedChange={(val) =>
+                  setEnabled((prev) => ({ ...prev, [day]: val }))
+                }
+              />
+              <Label htmlFor={`enabled_${day}`} className="text-sm">
+                {dashboard.dayLabels[day]}
+              </Label>
+            </div>
+            <Input
+              type="time"
+              name={`start_${day}`}
+              defaultValue={slot?.start_time?.slice(0, 5) ?? "09:00"}
+              className="w-28"
+            />
+            <span className="text-muted-foreground text-sm">{dashboard.to}</span>
+            <Input
+              type="time"
+              name={`end_${day}`}
+              defaultValue={slot?.end_time?.slice(0, 5) ?? "21:00"}
+              className="w-28"
+            />
+          </div>
+        );
+      })}
 
-          {state.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
-          )}
+      {state.error && (
+        <p className="text-sm text-destructive">{state.error}</p>
+      )}
 
-          {state.success && !state.error && (
-            <p className="text-sm text-green-600">{dashboard.scheduleSaved}</p>
-          )}
+      {state.success && !state.error && (
+        <p className="text-sm text-green-600">{dashboard.scheduleSaved}</p>
+      )}
 
-          <Button type="submit" disabled={isPending}>
-            {isPending ? common.saving : dashboard.saveSchedule}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <Button type="submit" disabled={isPending}>
+        {isPending ? common.saving : dashboard.saveSchedule}
+      </Button>
+    </form>
   );
 }

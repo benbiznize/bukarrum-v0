@@ -40,13 +40,13 @@ export async function getResourcesForLocation(locationId: string) {
   return data.map((row) => row.resource).filter(Boolean);
 }
 
-export async function getAddOnsForLocation(locationId: string) {
+export async function getAddOnsForResource(resourceId: string) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("add_on_services")
-    .select("id, name, description, hourly_rate")
-    .eq("location_id", locationId)
+    .select("id, name, description, unit_price, pricing_mode")
+    .eq("resource_id", resourceId)
     .eq("is_active", true)
     .order("name");
 
@@ -193,7 +193,10 @@ export async function getTimeSlots(
 
 export async function createBooking(
   formData: FormData
-): Promise<{ error: ""; bookingId: string } | { error: BookingErrorCode }> {
+): Promise<
+  | { error: ""; bookingId: string; bookingNumber: number }
+  | { error: BookingErrorCode }
+> {
   const resourceId = formData.get("resourceId") as string;
   const locationId = formData.get("locationId") as string;
   const date = formData.get("date") as string;
@@ -264,11 +267,13 @@ export async function createBooking(
 
   const {
     booking_id: bookingId,
+    booking_number: bookingNumber,
     total_price: totalPrice,
     resource_price: resourcePrice,
     add_ons: addOns,
   } = rpcResult as {
     booking_id: string;
+    booking_number: number;
     total_price: number;
     resource_price: number;
     add_ons: { id: string; name: string; price: number }[];
@@ -305,6 +310,7 @@ export async function createBooking(
     );
 
     const emailData = {
+      bookingNumber,
       bookerName: name,
       bookerEmail: email,
       tenantName: tenant.name,
@@ -327,7 +333,7 @@ export async function createBooking(
     }
   }
 
-  return { error: "", bookingId };
+  return { error: "", bookingId, bookingNumber };
 }
 
 /** Extract the hour (0-23) of a Date in a given timezone. */

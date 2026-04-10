@@ -53,6 +53,7 @@ export default async function BookingDetailPage({
     .select(
       `
       id,
+      booking_number,
       start_time,
       end_time,
       duration_hours,
@@ -83,7 +84,7 @@ export default async function BookingDetailPage({
       add_ons:booking_add_ons(
         id,
         price,
-        add_on:add_on_services(name)
+        add_on:add_on_services(name, pricing_mode, unit_price)
       ),
       payments:booking_payments(
         id,
@@ -129,7 +130,11 @@ export default async function BookingDetailPage({
   const addOns = (booking.add_ons ?? []) as unknown as Array<{
     id: string;
     price: number;
-    add_on: { name: string } | null;
+    add_on: {
+      name: string;
+      pricing_mode: "hourly" | "flat";
+      unit_price: number;
+    } | null;
   }>;
   const payments = ((booking.payments ?? []) as unknown as BookingPaymentRow[])
     .slice()
@@ -170,10 +175,10 @@ export default async function BookingDetailPage({
 
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{detail.title}</h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            #{booking.id.slice(0, 8)}
-          </p>
+          <h1 className="text-2xl font-bold font-mono tabular-nums">
+            #{booking.booking_number}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1">{detail.title}</p>
         </div>
         <div className="flex gap-2">
           <Badge variant={STATUS_VARIANT[booking.status] ?? "outline"}>
@@ -248,12 +253,34 @@ export default async function BookingDetailPage({
           {addOns.length > 0 && (
             <>
               <Separator className="my-2" />
-              {addOns.map((item) => (
-                <div key={item.id} className="flex justify-between py-1">
-                  <span>{item.add_on?.name ?? "—"}</span>
-                  <span>{formatCLP(item.price)}</span>
-                </div>
-              ))}
+              {addOns.map((item) => {
+                // Breakdown mirrors the server-side CASE in the booking RPC:
+                //   hourly -> "unit_price/h × durationHours"
+                //   flat   -> "Tarifa fija"
+                // When the linked add-on row was deleted, item.add_on is null
+                // and we fall back to showing just the snapshotted price.
+                const mode = item.add_on?.pricing_mode;
+                const unit = item.add_on?.unit_price;
+                const breakdown =
+                  mode === "hourly" && unit != null
+                    ? `${formatCLP(unit)}/h × ${booking.duration_hours}h`
+                    : mode === "flat"
+                      ? detail.flatFee
+                      : null;
+                return (
+                  <div key={item.id} className="flex justify-between py-1">
+                    <div>
+                      <div>{item.add_on?.name ?? "—"}</div>
+                      {breakdown && (
+                        <div className="text-xs text-muted-foreground">
+                          {breakdown}
+                        </div>
+                      )}
+                    </div>
+                    <span>{formatCLP(item.price)}</span>
+                  </div>
+                );
+              })}
             </>
           )}
           <Separator className="my-2" />

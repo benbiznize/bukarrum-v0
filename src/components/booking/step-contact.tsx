@@ -22,7 +22,7 @@ export function StepContact({
 }: {
   state: BookingState;
   dispatch: React.Dispatch<
-    | { type: "BOOKING_COMPLETE" }
+    | { type: "BOOKING_COMPLETE"; bookingNumber: number }
     | { type: "SET_ERROR"; error: string }
     | { type: "GO_BACK" }
   >;
@@ -66,7 +66,7 @@ export function StepContact({
       return;
     }
 
-    dispatch({ type: "BOOKING_COMPLETE" });
+    dispatch({ type: "BOOKING_COMPLETE", bookingNumber: result.bookingNumber });
   }
 
   // Format date for display
