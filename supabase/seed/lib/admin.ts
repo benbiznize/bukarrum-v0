@@ -18,13 +18,15 @@ function adminClient(): SupabaseClient {
 
 /**
  * Idempotent: creates the demo auth user if missing, otherwise
- * updates the password/id to match DEMO. This is called BEFORE the
- * main pg transaction because the admin API doesn't share our
- * connection.
+ * verifies the existing row matches DEMO.authUserId and returns
+ * without mutation. This is called BEFORE the main pg transaction
+ * because the admin API doesn't share our connection.
  *
  * `supabase db reset --no-seed` wipes auth.users, so in the normal
  * flow we always hit the "create" branch. The "already exists" branch
- * exists purely for safety when someone runs `db:seed` alone.
+ * exists purely for safety when someone runs `db:seed` alone — and
+ * throws loudly if the existing id doesn't match, so the caller can
+ * `db reset` and try again.
  */
 export async function ensureDemoAuthUser(): Promise<void> {
   const admin = adminClient();
