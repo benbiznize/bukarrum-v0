@@ -20,5 +20,9 @@ export function PaymentStatusBadge({
   status: PaymentStatus;
   label: string;
 }) {
-  return <Badge variant={PAYMENT_VARIANT[status]}>{label}</Badge>;
+  return (
+    <Badge variant={PAYMENT_VARIANT[status]} data-testid="payment-status-badge">
+      {label}
+    </Badge>
+  );
 }

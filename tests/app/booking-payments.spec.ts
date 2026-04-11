@@ -104,14 +104,14 @@ test.describe("Booking payments — auto-confirm on full payment", () => {
     await page.goto(`/dashboard/e2e-studio/bookings/${bookingId}`);
 
     // Sanity: booking starts as Pendiente / Sin pagar, NOT Confirmada / Pagado.
+    // Use the payment-status-badge test id so we aren't fooled by the
+    // "Pagado: $0" summary row label on the detail page.
+    const paymentBadge = page.getByTestId("payment-status-badge");
     await expect(
       page.getByText("Pendiente", { exact: true }).first()
     ).toBeVisible();
-    await expect(
-      page.getByText("Sin pagar", { exact: true }).first()
-    ).toBeVisible();
+    await expect(paymentBadge).toHaveText("Sin pagar");
     await expect(page.getByText("Confirmada", { exact: true })).toHaveCount(0);
-    await expect(page.getByText("Pagado", { exact: true })).toHaveCount(0);
 
     // Open the payment dialog. The amount prefills with the full balance
     // (10000) and the method defaults to cash — we just submit.
@@ -129,7 +129,7 @@ test.describe("Booking payments — auto-confirm on full payment", () => {
     await expect(
       page.getByText("Confirmada", { exact: true })
     ).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText("Pagado", { exact: true })).toBeVisible();
+    await expect(paymentBadge).toHaveText("Pagado");
 
     // Database side is the source of truth — verify the status flipped there too.
     const { data: updated } = await supabase
