@@ -40,6 +40,9 @@ supabase/.env
 # playwright mcp
 .playwright-mcp/
 
+# worktrees
+.worktrees/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
