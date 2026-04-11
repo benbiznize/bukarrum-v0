@@ -140,25 +140,35 @@ function applyNonTabFilters<T>(
   return out;
 }
 
+export type BookingsQueryResult = {
+  data: unknown;
+  count: number | null;
+  error: unknown;
+};
+
 /**
- * Builds the main list query for the bookings page.
+ * Runs the main list query for the bookings page. Unlike `build*Query`
+ * helpers elsewhere, this one is async because the text-search branch
+ * needs two round-trips: first the RPC to find matching booking IDs,
+ * then a standard select to rehydrate the joined `ROW_SELECT` shape
+ * (the RPC returns `setof public.bookings` — no joined booker/resource/
+ * location columns, which the UI needs).
  *
- * Two branches:
- * 1. No text query → chain `.from('bookings').select(...)` with tenant guard.
- * 2. Text query present → call `search_bookings` RPC which handles the
- *    multi-column ilike and all filters in a single round-trip.
- *
- * The caller should `await` the returned thenable to get `{ data, count }`.
+ * Branches:
+ * 1. No text query → single `.from('bookings').select(ROW_SELECT)` with
+ *    tenant guard + tab/filter chain.
+ * 2. Text query → call `search_bookings` + `search_bookings_count` RPCs
+ *    in parallel, then rehydrate rows with joined shape via `.in('id', ids)`.
+ *    Preserves the RPC's efficient cross-table ILIKE.
  */
-export function buildBookingsQuery(
+export async function buildBookingsQuery(
   supabase: Client,
   tenantId: string,
   filters: BookingsFilters,
   now: Date
-) {
+): Promise<BookingsQueryResult> {
   if (filters.q) {
-    // RPC path
-    return supabase.rpc("search_bookings", {
+    const rpcArgs = {
       p_tenant_id: tenantId,
       p_query: filters.q,
       p_tab: filters.tab,
@@ -169,8 +179,38 @@ export function buildBookingsQuery(
         : undefined,
       p_to: filters.toDate ? localDateToUtc(filters.toDate, "end") : undefined,
       p_has_add_ons: filters.hasAddOns ?? undefined,
-      p_page: filters.page,
-    });
+    };
+
+    const [idResult, countResult] = await Promise.all([
+      supabase.rpc("search_bookings", { ...rpcArgs, p_page: filters.page }),
+      supabase.rpc("search_bookings_count", rpcArgs),
+    ]);
+
+    if (idResult.error) {
+      return { data: null, count: null, error: idResult.error };
+    }
+
+    const rpcRows = (idResult.data ?? []) as Array<{ id: string }>;
+    const ids = rpcRows.map((r) => r.id);
+    const count =
+      (countResult.data as number | null) ?? (countResult.error ? null : 0);
+
+    if (ids.length === 0) {
+      return { data: [], count, error: null };
+    }
+
+    // Rehydrate with joined shape, preserving the RPC's ordering.
+    const hydrated = await supabase
+      .from("bookings")
+      .select(ROW_SELECT)
+      .in("id", ids)
+      .order("start_time", { ascending: false });
+
+    return {
+      data: hydrated.data,
+      count,
+      error: hydrated.error,
+    };
   }
 
   let q = supabase
@@ -183,7 +223,8 @@ export function buildBookingsQuery(
 
   const from = (filters.page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
-  return q.order("start_time", { ascending: false }).range(from, to);
+  const result = await q.order("start_time", { ascending: false }).range(from, to);
+  return { data: result.data, count: result.count, error: result.error };
 }
 
 /**

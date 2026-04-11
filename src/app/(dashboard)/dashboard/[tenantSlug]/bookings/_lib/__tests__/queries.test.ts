@@ -14,6 +14,7 @@ type MockChain = {
   or: Spy;
   order: Spy;
   range: Spy;
+  then: Spy;
 };
 
 function makeChain(): MockChain {
@@ -28,13 +29,29 @@ function makeChain(): MockChain {
   chain.or = vi.fn(self);
   chain.order = vi.fn(self);
   chain.range = vi.fn(self);
+  // Make the chain thenable so `await` on the builder resolves to a standard result.
+  chain.then = vi.fn((resolve: (v: unknown) => void) =>
+    resolve({ data: [], count: 0, error: null })
+  );
   return chain;
 }
 
 function makeClient() {
   const chain = makeChain();
   const from = vi.fn(() => chain);
-  const rpc = vi.fn(() => chain);
+  // RPC returns a thenable resolving to `{ data, error }` — search_bookings
+  // yields rows of IDs, search_bookings_count yields a bigint.
+  const rpc = vi.fn((name: string) => ({
+    then: (resolve: (v: unknown) => void) => {
+      if (name === "search_bookings") {
+        resolve({ data: [], error: null });
+      } else if (name === "search_bookings_count") {
+        resolve({ data: 0, error: null });
+      } else {
+        resolve({ data: null, error: null });
+      }
+    },
+  }));
   return { from, rpc, chain };
 }
 
@@ -61,8 +78,8 @@ describe("buildBookingsQuery", () => {
     client = makeClient();
   });
 
-  it("selects from bookings with the ROW_SELECT shape", () => {
-    buildBookingsQuery(
+  it("selects from bookings with the ROW_SELECT shape", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters(),
@@ -75,8 +92,8 @@ describe("buildBookingsQuery", () => {
     );
   });
 
-  it("always applies the tenant-isolation filter on the joined resource", () => {
-    buildBookingsQuery(
+  it("always applies the tenant-isolation filter on the joined resource", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters(),
@@ -85,8 +102,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.eq).toHaveBeenCalledWith("resource.tenant_id", TENANT_ID);
   });
 
-  it("'pending' tab narrows status", () => {
-    buildBookingsQuery(
+  it("'pending' tab narrows status", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ tab: "pending" }),
@@ -95,8 +112,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.eq).toHaveBeenCalledWith("status", "pending");
   });
 
-  it("'unpaid' tab narrows to confirmed + unpaid/partial", () => {
-    buildBookingsQuery(
+  it("'unpaid' tab narrows to confirmed + unpaid/partial", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ tab: "unpaid" }),
@@ -109,9 +126,9 @@ describe("buildBookingsQuery", () => {
     ]);
   });
 
-  it("'upcoming' tab applies start_time bounds of [now, now+7d]", () => {
+  it("'upcoming' tab applies start_time bounds of [now, now+7d]", async () => {
     const now = new Date("2026-04-10T12:00:00Z");
-    buildBookingsQuery(
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ tab: "upcoming" }),
@@ -130,9 +147,9 @@ describe("buildBookingsQuery", () => {
     );
   });
 
-  it("'past_due' tab applies start_time < now on confirmed", () => {
+  it("'past_due' tab applies start_time < now on confirmed", async () => {
     const now = new Date("2026-04-10T12:00:00Z");
-    buildBookingsQuery(
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ tab: "past_due" }),
@@ -145,8 +162,8 @@ describe("buildBookingsQuery", () => {
     );
   });
 
-  it("'archived' tab narrows to completed/cancelled/no_show", () => {
-    buildBookingsQuery(
+  it("'archived' tab narrows to completed/cancelled/no_show", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ tab: "archived" }),
@@ -159,8 +176,8 @@ describe("buildBookingsQuery", () => {
     ]);
   });
 
-  it("applies location/resource/has_add_ons filters when present", () => {
-    buildBookingsQuery(
+  it("applies location/resource/has_add_ons filters when present", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({
@@ -175,8 +192,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.eq).toHaveBeenCalledWith("has_add_ons", true);
   });
 
-  it("applies has_add_ons=false when hasAddOns is false", () => {
-    buildBookingsQuery(
+  it("applies has_add_ons=false when hasAddOns is false", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ hasAddOns: false }),
@@ -185,8 +202,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.eq).toHaveBeenCalledWith("has_add_ons", false);
   });
 
-  it("orders by start_time desc and paginates with range(0, 49) on page 1", () => {
-    buildBookingsQuery(
+  it("orders by start_time desc and paginates with range(0, 49) on page 1", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters(),
@@ -198,8 +215,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.range).toHaveBeenCalledWith(0, 49);
   });
 
-  it("paginates with range(100, 149) on page 3", () => {
-    buildBookingsQuery(
+  it("paginates with range(100, 149) on page 3", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ page: 3 }),
@@ -208,8 +225,8 @@ describe("buildBookingsQuery", () => {
     expect(client.chain.range).toHaveBeenCalledWith(100, 149);
   });
 
-  it("delegates to search_bookings RPC when q is present", () => {
-    buildBookingsQuery(
+  it("delegates to search_bookings RPC when q is present", async () => {
+    await buildBookingsQuery(
       client as never,
       TENANT_ID,
       baseFilters({ q: "juan", tab: "pending" }),
@@ -223,7 +240,16 @@ describe("buildBookingsQuery", () => {
         p_tab: "pending",
       })
     );
-    // RPC path: do NOT use the table query builder
+    expect(client.rpc).toHaveBeenCalledWith(
+      "search_bookings_count",
+      expect.objectContaining({
+        p_tenant_id: TENANT_ID,
+        p_query: "juan",
+        p_tab: "pending",
+      })
+    );
+    // Search branch skips the table query builder when the RPC returns zero
+    // matches (our mock) — no rehydration round-trip needed.
     expect(client.from).not.toHaveBeenCalled();
   });
 });
