@@ -12,6 +12,16 @@ Two user types:
 
 **One business = one tenant = one membership.** A tenant cannot represent multiple businesses.
 
+## Brand & Design
+
+The Bukarrum brand system is documented in [docs/brand/brand-book.html](docs/brand/brand-book.html) — open it in a browser (or read the raw HTML/CSS) before making significant visual decisions. At a glance:
+
+- **Typography**: `Fraunces` (serif, display/headlines) + `Outfit` (sans, UI/body).
+- **Palette** (dark-mode native, lime accent): `--bk-dark #0D0D0D`, `--bk-mid #1A1A1A`, `--bk-surface #242424`, `--bk-muted #666`, `--bk-light #F5F5F0`, `--bk-white #FFFFFF`, `--bk-lime #E8FF47`.
+- **Voice**: defined in the brand book — do not guess. Copy that ships to users (marketing, empty states, error messages) should be checked against the brand book's tone guidance, not invented ad-hoc.
+
+When the brand book and shadcn defaults disagree, the brand book wins — shadcn is the component library, not the design system.
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router)
