@@ -443,6 +443,36 @@
       "upgradeDesc": "Accede a métricas detalladas de tu negocio con el plan Enterprise.",
       "upgradeButton": "Mejorar plan"
     },
+    "customers": "Clientes",
+    "customersList": {
+      "title": "Clientes",
+      "subtitle": "Personas que han reservado en tus ubicaciones",
+      "countSummary": "{current} de {total} clientes",
+      "searchPlaceholder": "Buscar por nombre, correo o teléfono…",
+      "searchAriaLabel": "Buscar clientes",
+      "sort": {
+        "spend": "Mayor gasto",
+        "recent": "Más recientes",
+        "name": "Nombre"
+      },
+      "sortAriaLabel": "Ordenar clientes",
+      "columns": {
+        "customer": "Cliente",
+        "phone": "Teléfono",
+        "bookings": "Reservas",
+        "totalPaid": "Total pagado",
+        "lastBooking": "Última reserva",
+        "since": "Cliente desde"
+      },
+      "emptyTitle": "Aún no tienes clientes",
+      "emptyDescription": "Cuando alguien reserve en tus ubicaciones, aparecerá aquí.",
+      "noResultsSearch": "No hay clientes que coincidan con «{query}»",
+      "pagination": {
+        "pageOf": "Página {current} de {total}",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      }
+    },
     "dateRange": {
       "last7Days": "Últimos 7 días",
       "last30Days": "Últimos 30 días",

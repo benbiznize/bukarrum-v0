@@ -10,6 +10,7 @@ import {
   Settings,
   LayoutDashboard,
   Plus,
+  Users,
 } from "lucide-react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { LanguageToggle } from "@/components/ui/language-toggle";
@@ -80,6 +81,12 @@ export function DashboardSidebar({
             icon={BarChart3}
             label={dashboard.analytics}
             active={pathname.startsWith(`${base}/analytics`)}
+          />
+          <SidebarLink
+            href={`${base}/customers`}
+            icon={Users}
+            label={dashboard.customers}
+            active={pathname.startsWith(`${base}/customers`)}
           />
         </div>
 

@@ -443,6 +443,36 @@
       "upgradeDesc": "Access detailed business metrics with the Enterprise plan.",
       "upgradeButton": "Upgrade plan"
     },
+    "customers": "Customers",
+    "customersList": {
+      "title": "Customers",
+      "subtitle": "People who have booked at your locations",
+      "countSummary": "{current} of {total} customers",
+      "searchPlaceholder": "Search by name, email or phone…",
+      "searchAriaLabel": "Search customers",
+      "sort": {
+        "spend": "Top spenders",
+        "recent": "Most recent",
+        "name": "Name"
+      },
+      "sortAriaLabel": "Sort customers",
+      "columns": {
+        "customer": "Customer",
+        "phone": "Phone",
+        "bookings": "Bookings",
+        "totalPaid": "Total paid",
+        "lastBooking": "Last booking",
+        "since": "Customer since"
+      },
+      "emptyTitle": "No customers yet",
+      "emptyDescription": "When someone books at your locations, they'll show up here.",
+      "noResultsSearch": "No customers match \"{query}\"",
+      "pagination": {
+        "pageOf": "Page {current} of {total}",
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
     "dateRange": {
       "last7Days": "Last 7 days",
       "last30Days": "Last 30 days",
