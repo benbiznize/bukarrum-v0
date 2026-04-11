@@ -48,7 +48,10 @@ describe("bookingsToCsv", () => {
   it("formats dates in the booking's own location timezone", () => {
     const csv = bookingsToCsv([row]);
     const cols = csv.split("\n")[1].split(",");
-    // 2026-04-12T17:00:00Z in America/Santiago is 13:00 on 2026-04-12 (UTC-4 during daylight saving)
+    // 2026-04-12T17:00:00Z in America/Santiago is 13:00 on 2026-04-12.
+    // Chile's DST ended on 2026-04-05 (first Sunday of April), so 04-12 is
+    // Chile standard time (CLT = UTC-4). Intl.DateTimeFormat uses the ICU
+    // tzdata to handle this automatically — do not hardcode the offset.
     expect(cols[1]).toBe("2026-04-12");
     expect(cols[2]).toBe("13:00");
   });
