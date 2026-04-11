@@ -14,7 +14,8 @@ export function BookingsTabs({ counts }: { counts: CountsByTab }) {
   const searchParams = useSearchParams();
   const activeTab = (searchParams.get("tab") as BookingTab) ?? "all";
   const { dashboard } = useDict();
-  const tabLabels = dashboard.bookingsList.tabs;
+  const list = dashboard.bookingsList;
+  const tabLabels = list.tabs;
 
   function hrefForTab(tab: BookingTab): string {
     const params = new URLSearchParams(searchParams.toString());
@@ -35,7 +36,7 @@ export function BookingsTabs({ counts }: { counts: CountsByTab }) {
 
   return (
     <nav
-      aria-label="Bookings tabs"
+      aria-label={list.tabsAriaLabel}
       className="mb-6 overflow-x-auto border-b"
     >
       <ul className="flex gap-4 whitespace-nowrap">

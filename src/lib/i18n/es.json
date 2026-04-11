@@ -311,6 +311,7 @@
         "archived": "Archivadas"
       },
       "filters": {
+        "sheetTitle": "Filtros",
         "date": "Fecha",
         "dateAll": "Cualquier fecha",
         "dateToday": "Hoy",
@@ -327,6 +328,8 @@
         "addOnsWith": "Con extras",
         "addOnsWithout": "Sin extras"
       },
+      "tabsAriaLabel": "Pestañas de reservas",
+      "rowCheckboxAriaLabel": "Seleccionar reserva",
       "columns": {
         "number": "Número",
         "when": "Cuándo",

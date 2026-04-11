@@ -259,11 +259,11 @@ export function BookingsFilterBar({ locations, resources }: Props) {
             render={<Button variant="outline" size="sm" className="w-full" />}
           >
             <Filter className="mr-2 h-4 w-4" />
-            Filtros
+            {f.sheetTitle}
           </SheetTrigger>
           <SheetContent side="bottom">
             <SheetHeader>
-              <SheetTitle>Filtros</SheetTitle>
+              <SheetTitle>{f.sheetTitle}</SheetTitle>
             </SheetHeader>
             <div className="mt-4">{chips}</div>
           </SheetContent>

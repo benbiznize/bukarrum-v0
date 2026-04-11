@@ -311,6 +311,7 @@
         "archived": "Archived"
       },
       "filters": {
+        "sheetTitle": "Filters",
         "date": "Date",
         "dateAll": "Any date",
         "dateToday": "Today",
@@ -327,6 +328,8 @@
         "addOnsWith": "With add-ons",
         "addOnsWithout": "Without add-ons"
       },
+      "tabsAriaLabel": "Bookings tabs",
+      "rowCheckboxAriaLabel": "Select booking",
       "columns": {
         "number": "Number",
         "when": "When",
