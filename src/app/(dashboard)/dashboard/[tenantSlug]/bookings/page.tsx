@@ -18,6 +18,7 @@ import {
 import { BookingStatusActions } from "@/components/dashboard/booking-status-actions";
 import { PaymentStatusBadge } from "@/components/dashboard/payment-status-badge";
 import { BookingsHeader } from "./_components/bookings-header";
+import { BookingsOmnibox } from "./_components/bookings-omnibox";
 
 // STATUS_LABELS loaded from dictionary in component below
 
@@ -130,6 +131,7 @@ export default async function BookingsPage({
         filteredCount={bookings?.length ?? 0}
         totalCount={totalCount ?? 0}
       />
+      <BookingsOmnibox />
 
       {bookings && bookings.length > 0 ? (
         <div className="rounded-md border">
