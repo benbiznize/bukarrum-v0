@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { BookingStatusActions } from "@/components/dashboard/booking-status-actions";
 import { PaymentStatusBadge } from "@/components/dashboard/payment-status-badge";
+import { BookingsHeader } from "./_components/bookings-header";
 
 // STATUS_LABELS loaded from dictionary in component below
 
@@ -87,6 +88,12 @@ export default async function BookingsPage({
     .eq("resource.tenant_id", tenant.id)
     .order("start_time", { ascending: false });
 
+  // Total bookings for the tenant (used by the header subtitle).
+  const { count: totalCount } = await supabase
+    .from("bookings")
+    .select("id", { count: "exact", head: true })
+    .eq("resource.tenant_id", tenant.id);
+
   const formatCLP = (amount: number) =>
     new Intl.NumberFormat("es-CL", {
       style: "currency",
@@ -119,9 +126,10 @@ export default async function BookingsPage({
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{d.bookings}</h1>
-      </div>
+      <BookingsHeader
+        filteredCount={bookings?.length ?? 0}
+        totalCount={totalCount ?? 0}
+      />
 
       {bookings && bookings.length > 0 ? (
         <div className="rounded-md border">
