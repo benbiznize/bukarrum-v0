@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
 import { sendBookingStatusChange } from "@/lib/resend/emails";
+import type { ActionResult } from "./_lib/types";
 
 type BookingStatus = Database["public"]["Enums"]["booking_status"];
 type PaymentMethod = Database["public"]["Enums"]["payment_method"];
@@ -244,4 +245,186 @@ export async function deleteBookingPayment(
   revalidatePath(`/dashboard/${tenantSlug}/bookings`);
   revalidatePath(`/dashboard/${tenantSlug}/bookings/${bookingId}`);
   return { error: "" };
+}
+
+// --------------------------------------------------------------
+// Bulk actions for the list page
+// --------------------------------------------------------------
+
+type TenantCtx =
+  | { ok: false; error: string }
+  | {
+      ok: true;
+      supabase: Awaited<ReturnType<typeof createClient>>;
+      tenantId: string;
+    };
+
+async function authenticateAndLoadTenant(
+  tenantSlug: string
+): Promise<TenantCtx> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autenticado" };
+
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", tenantSlug)
+    .eq("user_id", user.id)
+    .single();
+  if (!tenant) return { ok: false, error: "Tenant no encontrado" };
+
+  return { ok: true, supabase, tenantId: tenant.id };
+}
+
+/**
+ * Loads bookingIds belonging to the tenant, restricted to the allowed
+ * starting statuses. Returns the subset of ids the caller is authorized
+ * to mutate. This is the single tenant-isolation guard for every bulk
+ * action — never UPDATE without going through this filter.
+ */
+async function filterBookingsForTenant(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tenantId: string,
+  bookingIds: string[],
+  allowedStatuses: BookingStatus[]
+): Promise<string[]> {
+  if (bookingIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("id, resource:resources!inner(tenant_id), status")
+    .in("id", bookingIds)
+    .eq("resource.tenant_id", tenantId)
+    .in("status", allowedStatuses);
+  if (error || !data) return [];
+  return data.map((row) => row.id);
+}
+
+export async function confirmBookings(
+  tenantSlug: string,
+  bookingIds: string[]
+): Promise<ActionResult> {
+  const ctx = await authenticateAndLoadTenant(tenantSlug);
+  if (!ctx.ok) return { success: false, error: ctx.error };
+
+  const allowedIds = await filterBookingsForTenant(
+    ctx.supabase,
+    ctx.tenantId,
+    bookingIds,
+    ["pending"]
+  );
+  if (allowedIds.length === 0) {
+    return { success: false, error: "Ninguna reserva elegible para confirmar" };
+  }
+
+  const { error } = await ctx.supabase
+    .from("bookings")
+    .update({ status: "confirmed" })
+    .in("id", allowedIds);
+
+  if (error) {
+    return { success: false, error: "No se pudo confirmar. Intenta de nuevo." };
+  }
+
+  // Fire-and-forget email notifications for each confirmed booking.
+  // Notifier errors are swallowed — email is a best-effort side channel.
+  await Promise.all(
+    allowedIds.map((id) =>
+      notifyBookingStatusChange(ctx.supabase, id, "confirmed").catch(() => {})
+    )
+  );
+
+  revalidatePath(`/dashboard/${tenantSlug}/bookings`);
+  return { success: true, affectedCount: allowedIds.length };
+}
+
+export async function cancelBookings(
+  tenantSlug: string,
+  bookingIds: string[]
+): Promise<ActionResult> {
+  const ctx = await authenticateAndLoadTenant(tenantSlug);
+  if (!ctx.ok) return { success: false, error: ctx.error };
+
+  // Cancel is allowed from pending or confirmed; blocked for terminal states.
+  const allowedIds = await filterBookingsForTenant(
+    ctx.supabase,
+    ctx.tenantId,
+    bookingIds,
+    ["pending", "confirmed"]
+  );
+  if (allowedIds.length === 0) {
+    return { success: false, error: "Ninguna reserva elegible para cancelar" };
+  }
+
+  const { error } = await ctx.supabase
+    .from("bookings")
+    .update({ status: "cancelled" })
+    .in("id", allowedIds);
+
+  if (error) {
+    return { success: false, error: "No se pudo cancelar. Intenta de nuevo." };
+  }
+
+  await Promise.all(
+    allowedIds.map((id) =>
+      notifyBookingStatusChange(ctx.supabase, id, "cancelled").catch(() => {})
+    )
+  );
+
+  revalidatePath(`/dashboard/${tenantSlug}/bookings`);
+  return { success: true, affectedCount: allowedIds.length };
+}
+
+export async function markBookingsNoShow(
+  tenantSlug: string,
+  bookingIds: string[]
+): Promise<ActionResult> {
+  const ctx = await authenticateAndLoadTenant(tenantSlug);
+  if (!ctx.ok) return { success: false, error: ctx.error };
+
+  // No-show is only valid for past confirmed bookings. We enforce the
+  // "past" constraint via a secondary check here (the simple
+  // filterBookingsForTenant only checks status).
+  if (bookingIds.length === 0) {
+    return { success: false, error: "Ninguna reserva seleccionada" };
+  }
+
+  const { data: eligible } = await ctx.supabase
+    .from("bookings")
+    .select("id, resource:resources!inner(tenant_id), status, start_time")
+    .in("id", bookingIds)
+    .eq("resource.tenant_id", ctx.tenantId)
+    .eq("status", "confirmed")
+    .lt("start_time", new Date().toISOString());
+
+  const allowedIds = (eligible ?? []).map((r) => r.id);
+  if (allowedIds.length === 0) {
+    return {
+      success: false,
+      error: "Ninguna reserva elegible para marcar como no-show",
+    };
+  }
+
+  const { error } = await ctx.supabase
+    .from("bookings")
+    .update({ status: "no_show" })
+    .in("id", allowedIds);
+
+  if (error) {
+    return {
+      success: false,
+      error: "No se pudo marcar como no-show. Intenta de nuevo.",
+    };
+  }
+
+  await Promise.all(
+    allowedIds.map((id) =>
+      notifyBookingStatusChange(ctx.supabase, id, "no_show").catch(() => {})
+    )
+  );
+
+  revalidatePath(`/dashboard/${tenantSlug}/bookings`);
+  return { success: true, affectedCount: allowedIds.length };
 }
