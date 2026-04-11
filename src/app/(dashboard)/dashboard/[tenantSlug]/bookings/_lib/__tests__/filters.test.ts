@@ -66,6 +66,12 @@ describe("parseSearchParams", () => {
       "pending"
     );
   });
+
+  it("treats empty location/resource params as null", () => {
+    const f = parseSearchParams({ location: "", resource: "" });
+    expect(f.locationId).toBeNull();
+    expect(f.resourceId).toBeNull();
+  });
 });
 
 describe("filtersToSearchParams", () => {

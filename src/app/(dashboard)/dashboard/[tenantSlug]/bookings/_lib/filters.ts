@@ -20,6 +20,14 @@ function first(value: string | string[] | undefined): string | undefined {
   return value;
 }
 
+/** Returns null for null/undefined/empty-string, otherwise the original string.
+ * Used for optional UUID params where `?location=` (empty) should be treated
+ * the same as the param being absent. */
+function nullifyEmpty(value: string | undefined): string | null {
+  if (!value) return null;
+  return value;
+}
+
 const TAB_SET = new Set<BookingTab>(BOOKING_TABS);
 
 function parseTab(raw: string | undefined): BookingTab {
@@ -66,8 +74,8 @@ export function parseSearchParams(
   return {
     tab: parseTab(first(params.tab)),
     q,
-    locationId: first(params.location) ?? null,
-    resourceId: first(params.resource) ?? null,
+    locationId: nullifyEmpty(first(params.location)),
+    resourceId: nullifyEmpty(first(params.resource)),
     fromDate: parseIsoDate(first(params.from)),
     toDate: parseIsoDate(first(params.to)),
     hasAddOns: parseHasAddOns(first(params.has_add_ons)),
