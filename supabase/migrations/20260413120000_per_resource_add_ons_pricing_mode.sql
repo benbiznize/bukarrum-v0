@@ -41,9 +41,18 @@ alter table public.add_on_services
 --    For N resources at the location, the single add-on becomes N
 --    rows — one per resource — preserving availability semantics.
 
+-- NOTE: `location_id` is still NOT NULL on `add_on_services` at this point
+-- (it's only dropped in step 5 below). We therefore carry `ao.location_id`
+-- through the CTE and into the INSERT column list to satisfy the constraint
+-- for the cloned rows — they'll lose the column a few statements later anyway.
+-- Without this, the backfill explodes on any database that actually has
+-- existing add_on_services rows (e.g. Supabase Preview branches, which clone
+-- production data). Locally with `db:reset` it silently passes because the
+-- table is empty when migrations run, so the CTE produces zero rows.
 with source as (
   select
     ao.id           as old_id,
+    ao.location_id,
     ao.name,
     ao.description,
     ao.unit_price,
@@ -54,11 +63,11 @@ with source as (
   join public.resource_locations rl on rl.location_id = ao.location_id
 )
 insert into public.add_on_services (
-  resource_id, name, description, unit_price, is_active,
+  location_id, resource_id, name, description, unit_price, is_active,
   pricing_mode, created_at, updated_at
 )
 select
-  resource_id, name, description, unit_price, is_active,
+  location_id, resource_id, name, description, unit_price, is_active,
   'hourly'::public.add_on_pricing_mode, created_at, now()
 from source;
 
