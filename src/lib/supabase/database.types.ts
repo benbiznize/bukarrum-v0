@@ -259,6 +259,7 @@ export type Database = {
           created_at: string
           duration_hours: number
           end_time: string
+          has_add_ons: boolean
           id: string
           location_id: string | null
           notes: string | null
@@ -276,6 +277,7 @@ export type Database = {
           created_at?: string
           duration_hours: number
           end_time: string
+          has_add_ons?: boolean
           id?: string
           location_id?: string | null
           notes?: string | null
@@ -293,6 +295,7 @@ export type Database = {
           created_at?: string
           duration_hours?: number
           end_time?: string
+          has_add_ons?: boolean
           id?: string
           location_id?: string | null
           notes?: string | null
@@ -619,6 +622,56 @@ export type Database = {
         }[]
       }
       get_current_tenant_id: { Args: never; Returns: string }
+      search_bookings: {
+        Args: {
+          p_from?: string
+          p_has_add_ons?: boolean
+          p_location_id?: string
+          p_page?: number
+          p_query?: string
+          p_resource_id?: string
+          p_tab?: string
+          p_tenant_id: string
+          p_to?: string
+        }
+        Returns: {
+          booker_id: string
+          booking_number: number
+          created_at: string
+          duration_hours: number
+          end_time: string
+          has_add_ons: boolean
+          id: string
+          location_id: string | null
+          notes: string | null
+          paid_amount: number
+          payment_status: Database["public"]["Enums"]["booking_payment_status"]
+          resource_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["booking_status"]
+          total_price: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      search_bookings_count: {
+        Args: {
+          p_from?: string
+          p_has_add_ons?: boolean
+          p_location_id?: string
+          p_query?: string
+          p_resource_id?: string
+          p_tab?: string
+          p_tenant_id: string
+          p_to?: string
+        }
+        Returns: number
+      }
       upsert_booker: {
         Args: { p_email: string; p_name: string; p_phone?: string }
         Returns: string
