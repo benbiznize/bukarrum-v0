@@ -296,6 +296,90 @@
       "errorGeneric": "No se pudo registrar el pago. Intenta de nuevo.",
       "flatFee": "Tarifa fija"
     },
+    "bookingsList": {
+      "countSummary": "{current} de {total} reservas",
+      "searchPlaceholder": "Buscar por número, cliente, email o teléfono…",
+      "noResultsSearch": "No hay reservas que coincidan con \"{query}\"",
+      "noResultsFilter": "No hay reservas con estos filtros",
+      "clearFilters": "Limpiar filtros",
+      "tabs": {
+        "all": "Todas",
+        "pending": "Pendientes",
+        "unpaid": "Por cobrar",
+        "upcoming": "Próximas 7 días",
+        "past_due": "Vencidas",
+        "archived": "Archivadas"
+      },
+      "filters": {
+        "date": "Fecha",
+        "dateAll": "Cualquier fecha",
+        "dateToday": "Hoy",
+        "dateYesterday": "Ayer",
+        "dateThisWeek": "Esta semana",
+        "dateThisMonth": "Este mes",
+        "dateLast30": "Últimos 30 días",
+        "dateCustom": "Personalizado",
+        "location": "Sede",
+        "locationAll": "Todas las sedes",
+        "resource": "Recurso",
+        "resourceAll": "Todos los recursos",
+        "addOnsAll": "Con o sin extras",
+        "addOnsWith": "Con extras",
+        "addOnsWithout": "Sin extras"
+      },
+      "columns": {
+        "number": "Número",
+        "when": "Cuándo",
+        "customer": "Cliente",
+        "duration": "Duración",
+        "total": "Total",
+        "status": "Estado"
+      },
+      "pagination": {
+        "pageOf": "Página {current} de {total}",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
+      "bulk": {
+        "selected": "{count} seleccionadas",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "noShow": "No-show",
+        "export": "Exportar CSV",
+        "deselect": "Deseleccionar",
+        "cannotConfirmTooltip": "Solo reservas pendientes pueden confirmarse",
+        "cannotNoShowTooltip": "Solo reservas confirmadas pasadas pueden marcarse como no-show",
+        "confirmSuccess": "{count} reservas confirmadas",
+        "cancelSuccess": "{count} reservas canceladas",
+        "noShowSuccess": "{count} reservas marcadas como no-show",
+        "exportSuccess": "CSV exportado",
+        "actionError": "No se pudo completar la acción. Intenta de nuevo."
+      },
+      "detail": {
+        "quickActions": {
+          "confirm": "Confirmar",
+          "addPayment": "+ Pago",
+          "cancel": "Cancelar",
+          "markCompleted": "Marcar como completada",
+          "markNoShow": "Marcar no-show",
+          "reactivate": "Reactivar",
+          "copyLink": "Copiar enlace",
+          "print": "Imprimir",
+          "more": "Más acciones"
+        },
+        "sectionCustomer": "Cliente",
+        "sectionLocation": "Ubicación",
+        "sectionNotes": "Notas",
+        "activityTitle": "Actividad",
+        "activityCreated": "Reserva creada",
+        "activityPayment": "Pago de {amount} registrado",
+        "activityRefund": "Reembolso de {amount}",
+        "linesAndPayments": "Líneas y pagos",
+        "subtotal": "Subtotal",
+        "paid": "Pagado",
+        "remaining": "Restante"
+      }
+    },
     "addOns": {
       "title": "Servicios adicionales",
       "add": "Agregar",

@@ -296,6 +296,90 @@
       "errorGeneric": "Could not record the payment. Please try again.",
       "flatFee": "Flat fee"
     },
+    "bookingsList": {
+      "countSummary": "{current} of {total} bookings",
+      "searchPlaceholder": "Search by number, customer, email or phone…",
+      "noResultsSearch": "No bookings match \"{query}\"",
+      "noResultsFilter": "No bookings match these filters",
+      "clearFilters": "Clear filters",
+      "tabs": {
+        "all": "All",
+        "pending": "Pending",
+        "unpaid": "Needs payment",
+        "upcoming": "Next 7 days",
+        "past_due": "Past due",
+        "archived": "Archived"
+      },
+      "filters": {
+        "date": "Date",
+        "dateAll": "Any date",
+        "dateToday": "Today",
+        "dateYesterday": "Yesterday",
+        "dateThisWeek": "This week",
+        "dateThisMonth": "This month",
+        "dateLast30": "Last 30 days",
+        "dateCustom": "Custom",
+        "location": "Location",
+        "locationAll": "All locations",
+        "resource": "Resource",
+        "resourceAll": "All resources",
+        "addOnsAll": "With or without add-ons",
+        "addOnsWith": "With add-ons",
+        "addOnsWithout": "Without add-ons"
+      },
+      "columns": {
+        "number": "Number",
+        "when": "When",
+        "customer": "Customer",
+        "duration": "Duration",
+        "total": "Total",
+        "status": "Status"
+      },
+      "pagination": {
+        "pageOf": "Page {current} of {total}",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "bulk": {
+        "selected": "{count} selected",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "noShow": "No-show",
+        "export": "Export CSV",
+        "deselect": "Deselect",
+        "cannotConfirmTooltip": "Only pending bookings can be confirmed",
+        "cannotNoShowTooltip": "Only past confirmed bookings can be marked no-show",
+        "confirmSuccess": "{count} bookings confirmed",
+        "cancelSuccess": "{count} bookings cancelled",
+        "noShowSuccess": "{count} bookings marked no-show",
+        "exportSuccess": "CSV exported",
+        "actionError": "Could not complete the action. Please try again."
+      },
+      "detail": {
+        "quickActions": {
+          "confirm": "Confirm",
+          "addPayment": "+ Payment",
+          "cancel": "Cancel",
+          "markCompleted": "Mark as completed",
+          "markNoShow": "Mark no-show",
+          "reactivate": "Reactivate",
+          "copyLink": "Copy link",
+          "print": "Print",
+          "more": "More actions"
+        },
+        "sectionCustomer": "Customer",
+        "sectionLocation": "Location",
+        "sectionNotes": "Notes",
+        "activityTitle": "Activity",
+        "activityCreated": "Booking created",
+        "activityPayment": "Payment of {amount} recorded",
+        "activityRefund": "Refund of {amount}",
+        "linesAndPayments": "Lines and payments",
+        "subtotal": "Subtotal",
+        "paid": "Paid",
+        "remaining": "Remaining"
+      }
+    },
     "addOns": {
       "title": "Add-on services",
       "add": "Add",
