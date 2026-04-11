@@ -104,13 +104,9 @@ export function BookingQuickActions({
       ))}
       <DropdownMenu>
         <DropdownMenuTrigger
+          aria-label={qa.more}
           render={
-            <Button
-              size="sm"
-              variant="ghost"
-              aria-label={qa.more}
-              disabled={isPending}
-            />
+            <Button size="sm" variant="ghost" disabled={isPending} />
           }
         >
           <MoreHorizontal className="h-4 w-4" />
