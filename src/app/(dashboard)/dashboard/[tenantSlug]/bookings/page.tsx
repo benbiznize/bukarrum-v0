@@ -20,6 +20,7 @@ import { PaymentStatusBadge } from "@/components/dashboard/payment-status-badge"
 import { BookingsHeader } from "./_components/bookings-header";
 import { BookingsOmnibox } from "./_components/bookings-omnibox";
 import { BookingsTabs } from "./_components/bookings-tabs";
+import { BookingsFilterBar } from "./_components/bookings-filter-bar";
 import type { CountsByTab } from "./_lib/types";
 
 // STATUS_LABELS loaded from dictionary in component below
@@ -97,6 +98,30 @@ export default async function BookingsPage({
     .select("id", { count: "exact", head: true })
     .eq("resource.tenant_id", tenant.id);
 
+  // Filter-chip options: locations + resources (with their location assignments)
+  // so the resource chip can narrow itself when a location is picked.
+  const [{ data: locations }, { data: resourceRows }] = await Promise.all([
+    supabase
+      .from("locations")
+      .select("id, name")
+      .eq("tenant_id", tenant.id)
+      .order("name"),
+    supabase
+      .from("resources")
+      .select("id, name, resource_locations(location_id)")
+      .eq("tenant_id", tenant.id)
+      .order("name"),
+  ]);
+
+  const locationOptions = locations ?? [];
+  const resourceOptions = (resourceRows ?? []).map((r) => ({
+    id: r.id,
+    name: r.name,
+    location_ids: (r.resource_locations ?? []).map(
+      (rl: { location_id: string }) => rl.location_id
+    ),
+  }));
+
   // Placeholder tab counts — Task 19 swaps this for the real resolveCounts().
   const placeholderCounts: CountsByTab = {
     all: null,
@@ -145,6 +170,10 @@ export default async function BookingsPage({
       />
       <BookingsOmnibox />
       <BookingsTabs counts={placeholderCounts} />
+      <BookingsFilterBar
+        locations={locationOptions}
+        resources={resourceOptions}
+      />
 
       {bookings && bookings.length > 0 ? (
         <div className="rounded-md border">
