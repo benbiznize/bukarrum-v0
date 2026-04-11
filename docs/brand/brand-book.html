@@ -1,0 +1,1405 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bk-lime: #E8FF47;
+    --bk-dark: #0D0D0D;
+    --bk-mid: #1A1A1A;
+    --bk-surface: #242424;
+    --bk-muted: #666;
+    --bk-light: #F5F5F0;
+    --bk-white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .bb {
+    background: var(--bk-dark);
+    color: var(--bk-light);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* NAV */
+  .bb-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232,255,71,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 32px;
+    height: 52px;
+    overflow-x: auto;
+  }
+
+  .bb-nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--bk-lime);
+    letter-spacing: -0.5px;
+    margin-right: 32px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .bb-nav a {
+    color: rgba(245,245,240,0.5);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 14px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .bb-nav a:hover, .bb-nav a.active {
+    color: var(--bk-lime);
+    border-bottom-color: var(--bk-lime);
+  }
+
+  /* SECTIONS */
+  .bb-section {
+    padding: 80px 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .bb-section:first-of-type { padding-top: 100px; }
+
+  .section-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bk-lime);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 300;
+    color: var(--bk-white);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .section-body {
+    font-size: 15px;
+    color: rgba(245,245,240,0.65);
+    max-width: 640px;
+    line-height: 1.75;
+  }
+
+  /* HERO */
+  .bb-hero {
+    background: var(--bk-dark);
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 80px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(232,255,71,0.1);
+    border: 1px solid rgba(232,255,71,0.3);
+    color: var(--bk-lime);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .hero-wordmark {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(52px, 10vw, 96px);
+    font-weight: 700;
+    color: var(--bk-white);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .hero-wordmark .accent { color: var(--bk-lime); }
+
+  .hero-sub {
+    font-size: 14px;
+    color: rgba(245,245,240,0.4);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 16px;
+    position: relative;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(245,245,240,0.55);
+    max-width: 420px;
+    margin: 28px auto 0;
+    position: relative;
+    line-height: 1.7;
+  }
+
+  /* LOGO SECTION */
+  .logo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .logo-card {
+    border-radius: 12px;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .logo-card.dark { background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); }
+  .logo-card.light { background: #F5F5F0; }
+  .logo-card.lime { background: var(--bk-lime); }
+  .logo-card.outline { background: var(--bk-dark); border: 1px solid rgba(255,255,255,0.15); }
+
+  .logo-card-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: auto;
+  }
+
+  .logo-card.dark .logo-card-label { color: rgba(255,255,255,0.35); }
+  .logo-card.light .logo-card-label { color: rgba(0,0,0,0.35); }
+  .logo-card.lime .logo-card-label { color: rgba(0,0,0,0.5); }
+  .logo-card.outline .logo-card-label { color: rgba(255,255,255,0.35); }
+
+  .wordmark-display {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.03em;
+  }
+
+  .wordmark-display.on-dark { color: var(--bk-white); }
+  .wordmark-display.on-dark .dot { color: var(--bk-lime); }
+  .wordmark-display.on-light { color: #0D0D0D; }
+  .wordmark-display.on-light .dot { color: #0D0D0D; }
+  .wordmark-display.on-lime { color: #0D0D0D; }
+  .wordmark-display.on-lime .dot { color: rgba(0,0,0,0.4); }
+
+  .wordmark-sub {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: -6px;
+  }
+
+  .wordmark-display.on-dark .wordmark-sub { color: rgba(255,255,255,0.35); }
+  .wordmark-display.on-light .wordmark-sub { color: rgba(0,0,0,0.35); }
+  .wordmark-display.on-lime .wordmark-sub { color: rgba(0,0,0,0.45); }
+
+  /* PRONUNCIATION */
+  .pronunciation-card {
+    margin-top: 36px;
+    background: var(--bk-mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .pronun-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pronun-label {
+    font-size: 11px;
+    color: rgba(245,245,240,0.35);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .pronun-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--bk-white);
+  }
+
+  .pronun-text.lime { color: var(--bk-lime); }
+
+  .pronun-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* COLORS */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .color-swatch {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .swatch-color {
+    height: 80px;
+    width: 100%;
+  }
+
+  .swatch-info {
+    padding: 12px 14px;
+    background: var(--bk-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .swatch-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bk-white);
+    margin-bottom: 2px;
+  }
+
+  .swatch-hex {
+    font-size: 11px;
+    color: rgba(245,245,240,0.4);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .swatch-use {
+    font-size: 11px;
+    color: rgba(245,245,240,0.35);
+    margin-top: 4px;
+  }
+
+  /* TYPOGRAPHY */
+  .type-specimen {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .type-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    align-items: start;
+  }
+
+  .type-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 4px;
+  }
+
+  .type-meta-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bk-lime);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .type-meta-detail {
+    font-size: 11px;
+    color: rgba(245,245,240,0.35);
+    line-height: 1.6;
+  }
+
+  .type-h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--bk-white);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .type-h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--bk-white);
+    letter-spacing: -0.01em;
+  }
+
+  .type-h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--bk-white);
+    letter-spacing: -0.01em;
+  }
+
+  .type-body {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(245,245,240,0.65);
+    line-height: 1.75;
+  }
+
+  .type-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bk-lime);
+  }
+
+  .type-mono {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: rgba(245,245,240,0.5);
+    letter-spacing: 0.04em;
+  }
+
+  /* VOICE */
+  .voice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .voice-card {
+    background: var(--bk-mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .voice-card.do { border-top: 3px solid var(--bk-lime); }
+  .voice-card.dont { border-top: 3px solid rgba(255,80,80,0.7); }
+
+  .voice-indicator {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .voice-card.do .voice-indicator { color: var(--bk-lime); }
+  .voice-card.dont .voice-indicator { color: rgba(255,80,80,0.8); }
+
+  .voice-example {
+    font-size: 14px;
+    color: var(--bk-white);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  .voice-note {
+    font-size: 12px;
+    color: rgba(245,245,240,0.4);
+    margin-top: 12px;
+  }
+
+  /* PILLAR CARDS */
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .pillar-card {
+    background: var(--bk-mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+
+  .pillar-num {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: rgba(232,255,71,0.2);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .pillar-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--bk-white);
+    margin-bottom: 10px;
+  }
+
+  .pillar-body {
+    font-size: 13px;
+    color: rgba(245,245,240,0.5);
+    line-height: 1.7;
+  }
+
+  /* USERS */
+  .users-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .user-card {
+    border-radius: 12px;
+    padding: 28px 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .user-card.tenant { background: rgba(232,255,71,0.05); border-color: rgba(232,255,71,0.15); }
+  .user-card.end-user { background: var(--bk-mid); }
+
+  .user-role {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .user-card.tenant .user-role { color: var(--bk-lime); }
+  .user-card.end-user .user-role { color: rgba(245,245,240,0.4); }
+
+  .user-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--bk-white);
+    margin-bottom: 12px;
+  }
+
+  .user-desc {
+    font-size: 13px;
+    color: rgba(245,245,240,0.5);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .user-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .user-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 400;
+  }
+
+  .user-card.tenant .user-tag {
+    background: rgba(232,255,71,0.12);
+    color: var(--bk-lime);
+  }
+
+  .user-card.end-user .user-tag {
+    background: rgba(255,255,255,0.07);
+    color: rgba(245,245,240,0.55);
+  }
+
+  /* UI COMPONENTS PREVIEW */
+  .ui-preview-section {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .ui-preview-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(245,245,240,0.3);
+    margin-bottom: 12px;
+  }
+
+  /* Booking card preview */
+  .booking-preview {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 360px;
+  }
+
+  .booking-studio-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bk-white);
+    margin-bottom: 4px;
+  }
+
+  .booking-studio-type {
+    font-size: 12px;
+    color: rgba(245,245,240,0.35);
+    margin-bottom: 20px;
+  }
+
+  .booking-resource {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .booking-resource:hover { border-color: rgba(232,255,71,0.3); }
+  .booking-resource.selected { border-color: var(--bk-lime); background: rgba(232,255,71,0.06); }
+
+  .booking-resource-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--bk-white);
+  }
+
+  .booking-resource-price {
+    font-size: 12px;
+    color: rgba(245,245,240,0.4);
+    margin-top: 2px;
+  }
+
+  .booking-resource-tag {
+    font-size: 11px;
+    background: rgba(232,255,71,0.12);
+    color: var(--bk-lime);
+    padding: 2px 10px;
+    border-radius: 100px;
+  }
+
+  .bk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bk-lime);
+    color: #0D0D0D;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .bk-btn:hover { background: #d4ea3a; }
+
+  /* Dashboard preview */
+  .dash-preview {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .dash-top-bar {
+    background: #0D0D0D;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dash-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bk-white);
+  }
+
+  .dash-logo .dot { color: var(--bk-lime); }
+
+  .dash-studio-badge {
+    background: rgba(232,255,71,0.1);
+    border: 1px solid rgba(232,255,71,0.2);
+    color: var(--bk-lime);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.08em;
+  }
+
+  .dash-body {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+  }
+
+  .dash-sidebar {
+    background: rgba(255,255,255,0.02);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 0;
+  }
+
+  .dash-nav-item {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: rgba(245,245,240,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dash-nav-item.active {
+    color: var(--bk-lime);
+    background: rgba(232,255,71,0.06);
+    border-left: 2px solid var(--bk-lime);
+  }
+
+  .dash-nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .dash-main {
+    padding: 20px;
+  }
+
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .dash-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .dash-stat-label {
+    font-size: 10px;
+    color: rgba(245,245,240,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .dash-stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bk-white);
+  }
+
+  .dash-stat-value.lime { color: var(--bk-lime); }
+
+  /* SPACING */
+  .mt-36 { margin-top: 36px; }
+  .mt-20 { margin-top: 20px; }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 32px;
+  }
+
+  .section-divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .section-divider-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--bk-lime);
+  }
+
+  /* FOOTER */
+  .bb-footer {
+    text-align: center;
+    padding: 60px 32px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .bb-footer-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bk-white);
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .bb-footer-mark .accent { color: var(--bk-lime); }
+
+  .bb-footer-sub {
+    font-size: 12px;
+    color: rgba(245,245,240,0.25);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 600px) {
+    .bb-section { padding: 60px 24px; }
+    .logo-grid { grid-template-columns: 1fr; }
+    .voice-grid { grid-template-columns: 1fr; }
+    .pillar-grid { grid-template-columns: 1fr; }
+    .users-grid { grid-template-columns: 1fr; }
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+    .type-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="bb">
+  <h2 class="sr-only">Bukarrum Brand Book — visual identity guidelines for the Bukarrum B2B2C SaaS platform</h2>
+
+  <!-- NAV -->
+  <nav class="bb-nav">
+    <div class="bb-nav-logo">Bukarrum</div>
+    <a href="#identity" class="active">Identity</a>
+    <a href="#logo">Logo</a>
+    <a href="#color">Color</a>
+    <a href="#type">Typography</a>
+    <a href="#voice">Voice</a>
+    <a href="#audience">Audience</a>
+    <a href="#ui">UI</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="bb-hero">
+    <div class="hero-grid"></div>
+    <div class="hero-badge">Brand Book · v1.0</div>
+    <div class="hero-wordmark">Bukarrum<span class="accent">.</span></div>
+    <div class="hero-sub">Book a Room &nbsp;·&nbsp; Reserva tu espacio</div>
+    <div class="hero-desc">
+      The identity system for a SaaS that gives creative studios their own booking universe.
+    </div>
+  </div>
+
+  <!-- IDENTITY -->
+  <section class="bb-section" id="identity">
+    <span class="section-tag">01 — Brand Identity</span>
+    <h2 class="section-title">The studio behind<br>every studio.</h2>
+    <p class="section-body">
+      Bukarrum is a B2B2C SaaS platform that empowers creative studios — recording rooms, rehearsal spaces, photo studios — with a fully branded public booking page and a powerful admin dashboard. We sit invisibly behind every booking, making both the studio owner and their customers feel like the platform was built just for them.
+    </p>
+
+    <div class="pillar-grid mt-36">
+      <div class="pillar-card">
+        <div class="pillar-num">01</div>
+        <div class="pillar-title">Infrastructure, not interruption</div>
+        <div class="pillar-body">We disappear into the studio's experience. The booking flow feels native to their brand, not like a third-party tool.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-num">02</div>
+        <div class="pillar-title">Creative at the core</div>
+        <div class="pillar-body">Our users are musicians, photographers, videographers. Our brand must feel at home in the same world they work in.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-num">03</div>
+        <div class="pillar-title">Simple on top, powerful below</div>
+        <div class="pillar-body">End customers get effortless booking. Studio owners get deep control over every resource and configuration.</div>
+      </div>
+    </div>
+
+    <div class="section-divider mt-36">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-dot"></div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="section-body">
+      <strong style="color: var(--bk-white); font-weight: 500;">Mission:</strong> Make professional studio booking feel as natural as sending a message — for studios across Chile and LATAM.
+      <br><br>
+      <strong style="color: var(--bk-white); font-weight: 500;">Vision:</strong> Become the invisible infrastructure that powers creative commerce in Latin America.
+    </div>
+  </section>
+
+  <!-- LOGO -->
+  <section class="bb-section" id="logo">
+    <span class="section-tag">02 — Logo & Wordmark</span>
+    <h2 class="section-title">Wordmark<br>system.</h2>
+    <p class="section-body">
+      The Bukarrum wordmark is set in Fraunces — a display serif with optical size variation. The period at the end signals finality, confidence, and domain authority. Never alter, stretch, or recolor individual characters.
+    </p>
+
+    <div class="logo-grid">
+      <div class="logo-card dark">
+        <div class="wordmark-display on-dark">
+          Bukarrum<span class="dot">.</span>
+          <span class="wordmark-sub">Creative Space Booking</span>
+        </div>
+        <div class="logo-card-label">Primary · Dark background</div>
+      </div>
+      <div class="logo-card light">
+        <div class="wordmark-display on-light">
+          Bukarrum<span class="dot">.</span>
+          <span class="wordmark-sub" style="color: rgba(0,0,0,0.35);">Creative Space Booking</span>
+        </div>
+        <div class="logo-card-label">Primary · Light background</div>
+      </div>
+      <div class="logo-card lime">
+        <div class="wordmark-display on-lime">
+          Bukarrum<span class="dot">.</span>
+          <span class="wordmark-sub">Creative Space Booking</span>
+        </div>
+        <div class="logo-card-label">Accent · Lime background</div>
+      </div>
+      <div class="logo-card outline">
+        <div style="border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 16px 20px; display: inline-block;">
+          <div class="wordmark-display on-dark" style="font-size: 26px;">
+            Bukarrum<span class="dot">.</span>
+          </div>
+        </div>
+        <div class="logo-card-label">Outlined variant</div>
+      </div>
+    </div>
+
+    <div class="pronunciation-card">
+      <div class="pronun-item">
+        <div class="pronun-label">Written</div>
+        <div class="pronun-text">Bukarrum</div>
+      </div>
+      <div class="pronun-divider"></div>
+      <div class="pronun-item">
+        <div class="pronun-label">Spanish reading</div>
+        <div class="pronun-text lime">Bu · ka · rrum</div>
+      </div>
+      <div class="pronun-divider"></div>
+      <div class="pronun-item">
+        <div class="pronun-label">Sounds like</div>
+        <div class="pronun-text" style="font-style: italic; font-size: 18px; color: rgba(245,245,240,0.6);">"Book a room"</div>
+      </div>
+      <div class="pronun-divider"></div>
+      <div class="pronun-item">
+        <div class="pronun-label">Language origin</div>
+        <div class="pronun-text" style="font-size: 16px; color: rgba(245,245,240,0.5);">Spanish phonetics</div>
+      </div>
+    </div>
+
+    <div class="mt-36">
+      <div class="ui-preview-label">Logo usage rules</div>
+      <div class="voice-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="voice-card do">
+          <div class="voice-indicator">✓ Do</div>
+          <div class="voice-example" style="font-style: normal; font-size: 13px; line-height: 1.8; color: rgba(245,245,240,0.6);">
+            · Use on dark, light, or lime backgrounds<br>
+            · Always include the trailing period<br>
+            · Maintain minimum clear space of 1× the cap-height on all sides<br>
+            · Use the lockup with tagline for marketing contexts
+          </div>
+        </div>
+        <div class="voice-card dont">
+          <div class="voice-indicator">✗ Don't</div>
+          <div class="voice-example" style="font-style: normal; font-size: 13px; line-height: 1.8; color: rgba(245,245,240,0.6);">
+            · Never use a background color other than dark, white/light, or lime<br>
+            · Never stretch, condense, or alter tracking<br>
+            · Never write "bukarrum" in lowercase as a logo<br>
+            · Never use drop shadows or effects
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR -->
+  <section class="bb-section" id="color">
+    <span class="section-tag">03 — Color System</span>
+    <h2 class="section-title">Dark-first<br>with electric lime.</h2>
+    <p class="section-body">
+      Bukarrum's palette is built for dark surfaces first — mirrors the dim booths, padded walls, and focused atmosphere of creative studios. Bukarrum Lime is our singular accent: unexpected, energetic, distinctly ours.
+    </p>
+
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #E8FF47; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Bukarrum Lime</div>
+          <div class="swatch-hex">#E8FF47</div>
+          <div class="swatch-use">Primary accent · CTAs · Active states</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #0D0D0D; border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Bukarrum Black</div>
+          <div class="swatch-hex">#0D0D0D</div>
+          <div class="swatch-use">Primary background · Dominant surface</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #1A1A1A; border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Studio Dark</div>
+          <div class="swatch-hex">#1A1A1A</div>
+          <div class="swatch-use">Cards · Panels · Secondary surfaces</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #242424; border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-hex">#242424</div>
+          <div class="swatch-use">Elevated components · Inputs</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #F5F5F0; border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Off-White</div>
+          <div class="swatch-hex">#F5F5F0</div>
+          <div class="swatch-use">Body text · Light-mode primary bg</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-color" style="background: #666666; border-radius: 10px 10px 0 0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Muted</div>
+          <div class="swatch-hex">#666666</div>
+          <div class="swatch-use">Secondary labels · Placeholders</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-36" style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 28px 32px;">
+      <div class="ui-preview-label" style="margin-bottom: 16px;">Color usage principles</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <div style="font-size: 13px; font-weight: 500; color: var(--bk-lime); margin-bottom: 6px;">Lime is earned, not given</div>
+          <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">Only primary CTAs, active nav items, selected states, and key brand moments use Lime. Do not use it for decoration.</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 500; color: var(--bk-lime); margin-bottom: 6px;">Dark is the canvas</div>
+          <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">Design dark-first. Light mode should feel like a well-lit studio, not an overexposed photo. Off-white backgrounds, not pure white.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="bb-section" id="type">
+    <span class="section-tag">04 — Typography</span>
+    <h2 class="section-title">Two typefaces.<br>One system.</h2>
+    <p class="section-body">
+      Fraunces is our display serif — editorial, expressive, at home in a recording booth or a design agency. Outfit handles the interface with clarity and warmth. Together they create a system that feels professional without losing personality.
+    </p>
+
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">Display</div>
+          <div class="type-meta-detail">Fraunces<br>700 weight<br>-3% letter-spacing<br>1.1 line-height</div>
+        </div>
+        <div class="type-h1">Reserve your next<br>creative session.</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">Display Italic</div>
+          <div class="type-meta-detail">Fraunces<br>300 italic<br>-1% letter-spacing<br>For editorial pull-quotes</div>
+        </div>
+        <div class="type-h2">"The room was ready when we were."</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">UI Heading</div>
+          <div class="type-meta-detail">Outfit<br>500 weight<br>-1% letter-spacing<br>Dashboards & sections</div>
+        </div>
+        <div class="type-h3">Manage your resources</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">Body</div>
+          <div class="type-meta-detail">Outfit<br>300 weight<br>Normal tracking<br>1.75 line-height</div>
+        </div>
+        <div class="type-body">Configure your studio's booking availability, manage resource pricing, and track reservations — all from a single dashboard designed to get out of your way.</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">Label / Tag</div>
+          <div class="type-meta-detail">Outfit<br>500 weight<br>18% letter-spacing<br>All uppercase</div>
+        </div>
+        <div class="type-label">Booking confirmed · Studio A</div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-meta-name">Monospace</div>
+          <div class="type-meta-detail">Courier New<br>Regular<br>For codes, IDs, data</div>
+        </div>
+        <div class="type-mono">BKR-20250408-S1-001</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOICE -->
+  <section class="bb-section" id="voice">
+    <span class="section-tag">05 — Voice & Tone</span>
+    <h2 class="section-title">Confident.<br>Not corporate.</h2>
+    <p class="section-body">
+      Bukarrum speaks like a knowledgeable friend who runs studios — straightforward, warm, with a slight edge. We never over-explain. We're Chilean, we know our market, and we talk like it.
+    </p>
+
+    <div class="voice-grid">
+      <div class="voice-card do">
+        <div class="voice-indicator">✓ Do this</div>
+        <div class="voice-example">"Your recording room is booked. Show up, create."</div>
+        <div class="voice-note">Direct, assumes competence, ends with purpose.</div>
+      </div>
+      <div class="voice-card dont">
+        <div class="voice-indicator">✗ Not this</div>
+        <div class="voice-example">"Congratulations! Your reservation has been successfully processed and confirmed."</div>
+        <div class="voice-note">Redundant. Patronizing. Sounds like a bank.</div>
+      </div>
+      <div class="voice-card do">
+        <div class="voice-indicator">✓ Do this</div>
+        <div class="voice-example">"Sala A · $15.000/hr · Available from 14:00"</div>
+        <div class="voice-note">Dense with value. Let the info do the talking.</div>
+      </div>
+      <div class="voice-card dont">
+        <div class="voice-indicator">✗ Not this</div>
+        <div class="voice-example">"We are pleased to offer you access to our state-of-the-art recording facilities."</div>
+        <div class="voice-note">Passive, wordy, no personality.</div>
+      </div>
+      <div class="voice-card do">
+        <div class="voice-indicator">✓ Do this</div>
+        <div class="voice-example">"Something went wrong with this slot. Try another or contact the studio."</div>
+        <div class="voice-note">Honest about failure, immediately helpful.</div>
+      </div>
+      <div class="voice-card dont">
+        <div class="voice-indicator">✗ Not this</div>
+        <div class="voice-example">"We sincerely apologize for the inconvenience this may have caused you."</div>
+        <div class="voice-note">Stalling instead of helping.</div>
+      </div>
+    </div>
+
+    <div class="mt-36" style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 28px 32px;">
+      <div class="ui-preview-label" style="margin-bottom: 16px;">Tone modifiers by context</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div>
+          <div style="font-size: 12px; font-weight: 500; color: var(--bk-lime); margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase;">Booking flow</div>
+          <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">Calm, frictionless, concise. Every word earns its place. Zero unnecessary confirmation steps.</div>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 500; color: var(--bk-lime); margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase;">Admin dashboard</div>
+          <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">Functional, precise. Labels over tooltips. Familiar patterns. We respect that studio owners are busy.</div>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 500; color: var(--bk-lime); margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase;">Marketing / landing</div>
+          <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">More energy, slight edge. We can make a statement. Chilean directness, global ambition.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCE -->
+  <section class="bb-section" id="audience">
+    <span class="section-tag">06 — Audience</span>
+    <h2 class="section-title">Two users.<br>One platform.</h2>
+    <p class="section-body">
+      Bukarrum serves two distinct audiences with different needs, mental models, and moments in the product. We design for both without confusing either.
+    </p>
+
+    <div class="users-grid">
+      <div class="user-card tenant">
+        <div class="user-role">Tenant (Studio Owner)</div>
+        <div class="user-name">The Studio Operator</div>
+        <div class="user-desc">
+          Runs a recording studio, rehearsal space, or photo studio in Chile. Wants to stop managing bookings via WhatsApp. Needs control over their resources, availability, pricing, and clients — without needing a developer.
+        </div>
+        <div class="user-tags">
+          <span class="user-tag">Self-employed</span>
+          <span class="user-tag">1–5 staff</span>
+          <span class="user-tag">WhatsApp-heavy ops</span>
+          <span class="user-tag">Tech-cautious</span>
+          <span class="user-tag">Value-driven</span>
+        </div>
+      </div>
+      <div class="user-card end-user">
+        <div class="user-role">End Customer (Booker)</div>
+        <div class="user-name">The Creative</div>
+        <div class="user-desc">
+          A musician, band, photographer, or content creator looking to reserve a space. They'll interact with the studio's branded Bukarrum page — and may not know Bukarrum exists at all.
+        </div>
+        <div class="user-tags">
+          <span class="user-tag">Mobile-first</span>
+          <span class="user-tag">Spontaneous planner</span>
+          <span class="user-tag">Price-aware</span>
+          <span class="user-tag">Wants speed</span>
+          <span class="user-tag">Trust via aesthetics</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-36" style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 28px 32px;">
+      <div class="ui-preview-label" style="margin-bottom: 16px;">B2B2C brand logic</div>
+      <div style="font-size: 14px; color: rgba(245,245,240,0.55); line-height: 1.8; max-width: 600px;">
+        Bukarrum's brand is primarily visible to <span style="color: var(--bk-lime);">tenants (studio owners)</span> in the admin dashboard and during onboarding. End customers experience the <span style="color: var(--bk-white);">studio's brand</span>, powered silently by Bukarrum. This is intentional — our best marketing is an invisible, seamless booking experience.
+      </div>
+    </div>
+  </section>
+
+  <!-- UI -->
+  <section class="bb-section" id="ui">
+    <span class="section-tag">07 — UI Patterns</span>
+    <h2 class="section-title">Built for<br>both sides.</h2>
+    <p class="section-body">
+      Two core UI contexts define Bukarrum: the public-facing booking page (end customer experience, fully white-labeled per studio) and the tenant admin dashboard (studio owner experience, full Bukarrum brand).
+    </p>
+
+    <div class="ui-preview-section">
+      <div>
+        <div class="ui-preview-label">Public booking page — end customer</div>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start;">
+          <div class="booking-preview">
+            <div class="booking-studio-name">Estudio Norma</div>
+            <div class="booking-studio-type">Recording Studio · Santiago, Chile</div>
+
+            <div class="booking-resource selected">
+              <div>
+                <div class="booking-resource-name">Sala A — Grabación</div>
+                <div class="booking-resource-price">$18.000 / hora</div>
+              </div>
+              <div class="booking-resource-tag">Disponible</div>
+            </div>
+
+            <div class="booking-resource">
+              <div>
+                <div class="booking-resource-name">Sala B — Ensayo</div>
+                <div class="booking-resource-price">$9.000 / hora</div>
+              </div>
+              <div class="booking-resource-tag">Disponible</div>
+            </div>
+
+            <div class="booking-resource" style="opacity: 0.45; cursor: not-allowed;">
+              <div>
+                <div class="booking-resource-name">Sala C — Podcast</div>
+                <div class="booking-resource-price">$12.000 / hora</div>
+              </div>
+              <div style="font-size: 11px; color: rgba(245,245,240,0.4);">Reservada</div>
+            </div>
+
+            <button class="bk-btn">Reservar Sala A →</button>
+          </div>
+
+          <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 12px; padding-top: 4px;">
+            <div style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+              <div style="font-size: 11px; color: rgba(245,245,240,0.35); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">Principle</div>
+              <div style="font-size: 13px; color: rgba(245,245,240,0.65); line-height: 1.6;">Studio owners configure the studio name, logo, and colors. Bukarrum is invisible here — the booking page is theirs.</div>
+            </div>
+            <div style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+              <div style="font-size: 11px; color: rgba(245,245,240,0.35); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">Mobile-first</div>
+              <div style="font-size: 13px; color: rgba(245,245,240,0.65); line-height: 1.6;">The booking card is the primary interaction unit. Tap to select, tap to book. No account needed for end customers.</div>
+            </div>
+            <div style="background: var(--bk-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+              <div style="font-size: 11px; color: var(--bk-lime); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; margin-bottom: 6px;">URL format</div>
+              <div style="font-family: 'Courier New', monospace; font-size: 12px; color: rgba(245,245,240,0.55);">studioname.bukarrum.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <div class="ui-preview-label">Admin dashboard — tenant experience</div>
+        <div class="dash-preview">
+          <div class="dash-top-bar">
+            <div class="dash-logo">Bukarrum<span class="dot">.</span></div>
+            <div class="dash-studio-badge">Estudio Norma</div>
+          </div>
+          <div class="dash-body">
+            <div class="dash-sidebar">
+              <div class="dash-nav-item active">
+                <div class="dash-nav-dot"></div>
+                Dashboard
+              </div>
+              <div class="dash-nav-item">
+                <div class="dash-nav-dot"></div>
+                Resources
+              </div>
+              <div class="dash-nav-item">
+                <div class="dash-nav-dot"></div>
+                Bookings
+              </div>
+              <div class="dash-nav-item">
+                <div class="dash-nav-dot"></div>
+                Availability
+              </div>
+              <div class="dash-nav-item">
+                <div class="dash-nav-dot"></div>
+                Settings
+              </div>
+            </div>
+            <div class="dash-main">
+              <div class="dash-stats">
+                <div class="dash-stat">
+                  <div class="dash-stat-label">This week</div>
+                  <div class="dash-stat-value lime">14</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="dash-stat-label">Revenue</div>
+                  <div class="dash-stat-value">$186k</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="dash-stat-label">Occupancy</div>
+                  <div class="dash-stat-value">78%</div>
+                </div>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px;">
+                <div style="font-size: 11px; color: rgba(245,245,240,0.3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;">Upcoming today</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+                    <span style="color: rgba(245,245,240,0.7);">14:00 — 17:00 · Sala A</span>
+                    <span style="background: rgba(232,255,71,0.1); color: var(--bk-lime); padding: 2px 8px; border-radius: 100px; font-size: 10px;">Confirmed</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+                    <span style="color: rgba(245,245,240,0.7);">18:00 — 20:00 · Sala B</span>
+                    <span style="background: rgba(255,255,255,0.06); color: rgba(245,245,240,0.4); padding: 2px 8px; border-radius: 100px; font-size: 10px;">Pending</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-36" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <div style="background: var(--bk-mid); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 11px; color: var(--bk-lime); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 8px;">Border radius</div>
+        <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">8px components · 12px cards · 100px pills</div>
+      </div>
+      <div style="background: var(--bk-mid); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 11px; color: var(--bk-lime); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 8px;">Interactive states</div>
+        <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">Active: Lime border + tinted bg · Hover: border-color bump · Disabled: 45% opacity</div>
+      </div>
+      <div style="background: var(--bk-mid); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="font-size: 11px; color: var(--bk-lime); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 8px;">Motion</div>
+        <div style="font-size: 13px; color: rgba(245,245,240,0.5); line-height: 1.7;">150ms ease transitions on borders · 200ms for bg · No layout animation unless loading</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bb-footer">
+    <div class="bb-footer-mark">Bukarrum<span class="accent">.</span></div>
+    <div class="bb-footer-sub">Brand Book v1.0 · Santiago, Chile · 2025</div>
+  </div>
+</div>
+
+<script>
+  const navLinks = document.querySelectorAll('.bb-nav a');
+  const sections = document.querySelectorAll('.bb-section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const id = entry.target.getAttribute('id');
+        const link = document.querySelector(`.bb-nav a[href="#${id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-60px 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  const resources = document.querySelectorAll('.booking-resource');
+  resources.forEach(r => {
+    if (!r.style.cursor || r.style.cursor !== 'not-allowed') {
+      r.addEventListener('click', () => {
+        resources.forEach(x => x.classList.remove('selected'));
+        r.classList.add('selected');
+      });
+    }
+  });
+</script>
