@@ -19,6 +19,8 @@ import { BookingStatusActions } from "@/components/dashboard/booking-status-acti
 import { PaymentStatusBadge } from "@/components/dashboard/payment-status-badge";
 import { BookingsHeader } from "./_components/bookings-header";
 import { BookingsOmnibox } from "./_components/bookings-omnibox";
+import { BookingsTabs } from "./_components/bookings-tabs";
+import type { CountsByTab } from "./_lib/types";
 
 // STATUS_LABELS loaded from dictionary in component below
 
@@ -95,6 +97,16 @@ export default async function BookingsPage({
     .select("id", { count: "exact", head: true })
     .eq("resource.tenant_id", tenant.id);
 
+  // Placeholder tab counts — Task 19 swaps this for the real resolveCounts().
+  const placeholderCounts: CountsByTab = {
+    all: null,
+    pending: null,
+    unpaid: null,
+    upcoming: null,
+    past_due: null,
+    archived: null,
+  };
+
   const formatCLP = (amount: number) =>
     new Intl.NumberFormat("es-CL", {
       style: "currency",
@@ -132,6 +144,7 @@ export default async function BookingsPage({
         totalCount={totalCount ?? 0}
       />
       <BookingsOmnibox />
+      <BookingsTabs counts={placeholderCounts} />
 
       {bookings && bookings.length > 0 ? (
         <div className="rounded-md border">
